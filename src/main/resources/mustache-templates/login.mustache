@@ -1,0 +1,15 @@
+{{>layout/header}}
+<div class="container vertical-space">
+	<div class="row">
+		<div class="col-sm-6 col-lg-4">
+			<h2>{{ displayName }}</h2>
+			{{>authlib_fragments/login_form}}
+		</div>
+		<div class="col-sm-6 col-lg-8">
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	document.getElementById('username').focus();
+</script>
+{{>layout/footer}}

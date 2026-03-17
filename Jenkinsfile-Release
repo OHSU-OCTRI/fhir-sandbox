@@ -1,0 +1,49 @@
+pipeline {
+  agent any
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '3'))
+  }
+  environment {
+    // TODO: you should fill in the repository URL below
+    GIT_URL = ''
+    GIT_CREDENTIALS = 'gcrcicore-ghe-token'
+    DEFAULT_BRANCH = 'main'
+  }
+  parameters {
+    string(name: 'VERSION', description: 'The version to release.')
+  }
+  tools {
+    maven '3.8.2'
+    jdk 'JDK17'
+  }
+  stages {
+    stage('Check Parameters') {
+      steps {
+        deleteDir()
+        checkParams(params)
+      }
+    }
+    stage('Release') {
+      steps {
+        checkoutBranch(env.GIT_URL, env.GIT_CREDENTIALS, env.DEFAULT_BRANCH)
+        octriMavenReleasePrep(env.VERSION, env.DEFAULT_BRANCH)
+        octriMavenBuild()
+      }
+    }
+    stage('Build Docker Image') {
+      steps {
+        mavenDockerMetadata(env)
+        buildProjectDockerImage(env.IMAGE_NAME, env.VERSION)
+        bumpKubernetesManifests(env.IMAGE_NAME, env.VERSION, env.DEFAULT_BRANCH)
+      }
+    }
+    stage('Next Version') {
+      steps {
+        // blank string calculates next version from pom.xml
+        nextDevelopmentVersion('', env.DEFAULT_BRANCH)
+        octriMavenBuild()
+        buildProjectDockerImage(env.IMAGE_NAME)
+      }
+    }
+  }
+}

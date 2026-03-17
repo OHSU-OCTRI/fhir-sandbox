@@ -1,0 +1,24 @@
+pipeline {
+  agent any
+  options {
+    buildDiscarder(logRotator(numToKeepStr: '3'))
+  }
+  environment {
+    // TODO: you should fill in the repository URL below
+    GIT_URL = ''
+    DEPLOYMENT_FILE = 'k8s/prod/'
+  }
+  stages {
+    stage('Prepare') {
+      steps {
+        deleteDir()
+        checkoutMain(env.GIT_URL)
+      }
+    }
+    stage('Deploy to Kubernetes') {
+      steps {
+        applyKubernetesManifests(env.DEPLOYMENT_FILE, 'production')
+      }
+    }
+  }
+}

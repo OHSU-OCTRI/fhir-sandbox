@@ -1,0 +1,14 @@
+# ConfigMap for fhir-sandbox-prod
+#
+# k8s documentation:
+# - https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#create-a-configmap
+#
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: fhir-sandbox-prod
+data:
+  EXTRA_JAVA_OPTS: -XX:MaxRAMPercentage=75.0
+  SERVER_SERVLET_CONTEXTPATH: /fhir-sandbox
+  TZ: America/Los_Angeles
+  OCTRI_AUTHENTICATION_BASEURL: https://octriinternal.ohsu.edu

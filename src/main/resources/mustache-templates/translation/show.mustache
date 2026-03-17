@@ -1,0 +1,43 @@
+{{>layout/header}}
+<div class="container">
+    <h1>{{entityName}}</h1>
+    {{>components/messages}}
+    <div>
+        {{#entity}}
+        <h5>{{#i18n}}translation.locale.label{{/i18n}}</h5>
+        <p>
+            {{#locale}}{{.}}{{/locale}}
+            {{^locale}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/locale}}
+        </p>
+        <h5>{{#i18n}}translation.messageKey.label{{/i18n}}</h5>
+        <p>
+            {{#key}}{{.}}{{/key}}
+            {{^key}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/key}}
+        </p>
+        <h5>{{#i18n}}translation.description.label{{/i18n}}</h5>
+        <p>
+            {{#description}}{{.}}{{/description}}
+            {{^description}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/description}}
+        </p>
+        <div class="text-secondary small font-weight-light font-italic">
+            {{#i18n}}translation.lastUpdated{{/i18n}} {{#updatedAt}}{{.}}{{/updatedAt}}{{#updatedBy}} {{#i18n}}translation.byLabel{{/i18n}} {{.}}{{/updatedBy}}
+		</div>
+
+		<div class="card">
+		 <div class="card-header"><h5>{{#name}}{{.}} {{/name}}{{#i18n}}translation.content.label{{/i18n}}</h5></div>
+		  <div class="card-body">
+    		{{#content}}{{{.}}}{{/content}}
+		  </div>
+		</div>
+        <a href="{{req.contextPath}}{{baseRoute}}/" class="btn btn-link"><i class="fas fa-list"></i> {{#i18n}}system.entity.list{{/i18n}}</a>
+        {{#contentEditingEnabled}}
+        <a href="{{req.contextPath}}{{baseRoute}}/{{id}}/edit" class="btn btn-link"><i class="fas fa-edit"></i> {{#i18n}}system.entity.edit{{/i18n}}</a>
+        {{/contentEditingEnabled}}
+        {{#isAdminOrSuper}}
+        <a href="{{req.contextPath}}{{baseRoute}}/{{id}}/delete" onclick="return confirm('Delete this item?');"
+        	class="btn btn-link text-danger"><i class="fas fa-minus-square"></i> {{#i18n}}system.entity.delete{{/i18n}}</a>
+        {{/isAdminOrSuper}}
+        {{/entity}}
+    </div>
+</div>
+{{>layout/footer}}

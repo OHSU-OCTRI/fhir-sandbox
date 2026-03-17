@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+	<title>{{displayName}}</title>
+	<meta charset="utf-8">
+	<meta name="ctx" content="{{req.contextPath}}/">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+	{{>authlib_fragments/css}}
+	<link rel="stylesheet" type="text/css" href="{{req.contextPath}}/webjars/jquery-ui/jquery-ui.css">
+	<link rel="stylesheet" href="{{req.contextPath}}/webjars/datatables/css/dataTables.bootstrap5.min.css" />
+	<link rel="stylesheet" href="{{req.contextPath}}/assets/css/datepicker.css">
+	<link rel="stylesheet" href="{{req.contextPath}}/assets/css/main.css">
+
+	{{! Page-specific stylesheets can be specified in the view model }}
+	{{#pageStyles}}
+	<link rel="stylesheet" href="{{req.contextPath}}/assets/css/{{.}}">
+	{{/pageStyles}}
+</head>
+<body>
+	<header>
+
+		<nav class="navbar navbar-expand-md fixed-top bg-dark" data-bs-theme="dark">
+			<div class="container-fluid">
+				<a class="navbar-brand" href="#">{{displayName}}</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+					data-bs-target="#navbar_collapse" aria-controls="navbar_collapse"
+					role="button" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbar_collapse">
+					<ul class="navbar-nav me-auto">
+						<li class="nav-item"><a class="nav-link" href="{{req.contextPath}}/">{{#i18n}}system.nav.home{{/i18n}}</a></li>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" id="data_menu" data-bs-toggle="dropdown"
+							role="button" aria-haspopup="true" aria-expanded="false">{{#i18n}}system.nav.data{{/i18n}}</a>
+							<div class="dropdown-menu" aria-labelledby="data_menu">
+								{{>components/data_items}}
+							</div>
+						</li>
+												{{#isAdminOrSuper}}
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" id="admin_menu" data-bs-toggle="dropdown"
+							role="button" aria-haspopup="true" aria-expanded="false">{{#i18n}}system.nav.admin{{/i18n}}</a>
+							<div class="dropdown-menu" aria-labelledby="admin_menu">
+								{{! admin routes can go here }}
+								{{>components/admin_items}}
+							</div>
+						</li>
+						<li class="nav-item dropdown">
+							<a class="nav-link dropdown-toggle" href="#" id="user_management_menu" data-bs-toggle="dropdown"
+							role="button" aria-haspopup="true" aria-expanded="false">{{#i18n}}system.nav.users{{/i18n}}</a>
+							<div class="dropdown-menu" aria-labelledby="user_management_menu">
+								<a class="dropdown-item" href="{{req.contextPath}}/admin/user/new"><span class="fa fa-user-plus"></span> {{#i18n}}system.nav.users.new{{/i18n}}</a>
+								<a class="dropdown-item" href="{{req.contextPath}}/admin/user/list"><span class="fa fa-list"></span> {{#i18n}}system.nav.users.list{{/i18n}}</a>
+							</div></li>
+						{{/isAdminOrSuper}}
+											</ul>
+
+					<ul class="navbar-nav">
+						{{#isLoggedIn}}
+						<li class="nav-item">
+							<a class="nav-link" href="{{req.contextPath}}/logout"><span class="fa fa-power-off"></span> {{#i18n}}system.nav.logout{{/i18n}} ({{username}})</a>
+						</li>
+						{{/isLoggedIn}}
+						{{^isLoggedIn}}
+						<li class="nav-item">
+							<a class="nav-link" href="{{req.contextPath}}/login"><span class="fa fa-power-off"></span> {{#i18n}}system.nav.login{{/i18n}}</a>
+						</li>
+						{{/isLoggedIn}}
+					</ul>
+				</div>
+			</div>
+		</nav>
+
+	</header>
+	{{>layout/environment_banner}}
+
+	<main role="main" class="container">

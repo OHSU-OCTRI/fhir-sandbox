@@ -1,0 +1,12 @@
+{{>layout/header}}
+
+{{#entity.id}}
+<h1>Edit {{entityName}}</h1>
+{{/entity.id}}
+
+{{^entity.id}}
+<h1>New {{entityName}}</h1>
+{{/entity.id}}
+
+<div>
+{{>components/form_tag_open}}

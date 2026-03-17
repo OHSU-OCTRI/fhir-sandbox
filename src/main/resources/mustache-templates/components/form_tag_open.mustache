@@ -1,0 +1,17 @@
+{{! Id exists; display the 'edit' form }}
+{{#entity.id}}
+<form name="entityForm" method="POST" action="{{req.contextPath}}{{#submitAction}}{{.}}{{/submitAction}}{{^submitAction}}{{baseRoute}}/{{id}}/edit{{/submitAction}}" class="needs-validation" novalidate>
+	{{ >authlib_fragments/forms/csrf_input }}
+	<input type="hidden" name="version" value="{{entity.version}}" />
+	<div class="form-group">
+		<label for="id" class="form-label">ID</label> 
+		<input id="id" class="form-control" type="text" disabled="disabled" name="id" value="{{entity.id}}" />
+	</div>
+{{/entity.id}}
+
+
+{{! No id; display the 'new' form }}
+{{^entity.id}}
+<form name="entityForm" method="POST" action="{{req.contextPath}}{{#submitAction}}{{.}}{{/submitAction}}{{^submitAction}}{{baseRoute}}/new{{/submitAction}}" class="needs-validation" novalidate>
+	{{ >authlib_fragments/forms/csrf_input }}
+{{/entity.id}}

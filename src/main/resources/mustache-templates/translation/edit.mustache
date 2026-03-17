@@ -1,0 +1,28 @@
+{{>components/form_start}}
+    {{#entity}}
+		<input type="hidden" name="locale" value="{{#locale}}{{.}}{{/locale}}" />
+		<input type="hidden" name="messageKey" value="{{#messageKey}}{{.}}{{/messageKey}}" />
+        <input type="hidden" name="description" value="{{#description}}{{.}}{{/description}}" />
+        <input type="hidden" name="markupAllowed" value="{{#markupAllowed}}1{{/markupAllowed}}{{^markupAllowed}}0{{/markupAllowed}}" />
+        <div class="form-group">
+            <label for="content" class="form-label">{{#i18n}}translation.messageKey.label{{/i18n}}</label>
+            <input type="text" class="form-control" id="messageKey" name="messageKey" value="{{#messageKey}}{{.}}{{/messageKey}}" disabled>
+        </div>
+        {{#description}}
+        <p>{{.}}</p>
+        {{/description}}
+        {{#markupAllowed}}
+		<div class="managed-content-editor card mb-4">
+		 <div class="card-header"><h5>{{#i18n}}translation.content.label{{/i18n}}</h5></div>
+		  <div id="managed_content" class='card-body' data-content="{{#content}}{{.}}{{/content}}"></div>
+		</div>
+        {{/markupAllowed}}
+
+        {{^markupAllowed}}
+        <div class="form-group">
+            <label for="content" class="form-label">{{#i18n}}translation.content.label{{/i18n}}</label>
+            <input type="text" class="form-control" id="content" name="content" value="{{#content}}{{.}}{{/content}}" >
+        </div>
+        {{/markupAllowed}}
+	{{/entity}}
+{{>components/form_end}}

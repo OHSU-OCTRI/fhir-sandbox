@@ -1,0 +1,23 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fhir-sandbox-prod
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: fhir-sandbox-prod
+---
+apiVersion: getambassador.io/v3alpha1
+kind: Mapping
+metadata:
+  name: fhir-sandbox-prod
+spec:
+  hostname: octriinternal.ohsu.edu
+  prefix: /fhir-sandbox
+  rewrite: /fhir-sandbox
+  service: fhir-sandbox-prod

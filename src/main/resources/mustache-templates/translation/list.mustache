@@ -1,0 +1,32 @@
+{{>layout/header}}
+<div class="container">
+    <h1>{{entityName}} List</h1>
+    {{>components/messages}}
+    {{#contentEditingEnabled}}
+    {{>translation/nav_toggle}}
+    <a href="{{req.contextPath}}{{baseRoute}}/new" class="new-entity btn btn-success"><i class="fas fa-plus-circle"></i> {{#i18n}}system.entity.new{{/i18n}}</a>
+    {{/contentEditingEnabled}}
+    <table class="table table-striped table-bordered sorted">
+        <thead>
+        <tr>
+            <th>{{#i18n}}translation.locale.label{{/i18n}}</th>
+            <th>{{#i18n}}translation.messageKey.label{{/i18n}}</th>
+            <th>{{#i18n}}translation.description.label{{/i18n}}</th>
+            <th>{{#i18n}}translation.updatedBy.label{{/i18n}}</th>
+            <th>{{#i18n}}system.entity.actions{{/i18n}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#entity_list}}
+        <tr>
+            <td>{{#locale}}{{.}}{{/locale}}</td>
+            <td>{{#key}}{{.}}{{/key}}</td>
+            <td>{{#description}}{{.}}{{/description}}</td>
+            <td>{{#updatedBy}}{{.}}{{/updatedBy}}</td>
+            <td><a href="{{req.contextPath}}{{baseRoute}}/{{id}}">{{#i18n}}system.entity.view{{/i18n}}{{#contentEditingEnabled}}/{{#i18n}}system.entity.edit{{/i18n}}{{/contentEditingEnabled}}</a></td>
+        </tr>
+        {{/entity_list}}
+        </tbody>
+    </table>
+</div>
+{{>layout/footer}}

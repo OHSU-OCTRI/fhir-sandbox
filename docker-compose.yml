@@ -1,0 +1,19 @@
+# Base configuration
+# Keys without a value are passed into the config via a .env file in the same
+# directory as the `docker-compose` command was run from
+services:
+  app:
+    image: octri.ohsu.edu/fhir-sandbox
+    volumes:
+      - ./target/fhir-sandbox.jar:/app.jar
+    environment:
+      - SERVER_SERVLET_CONTEXTPATH
+      - SPRING_DATASOURCE_URL
+      - SPRING_DATASOURCE_USERNAME
+      - SPRING_DATASOURCE_PASSWORD
+      - LDAP_CONTEXTSOURCE_URL
+      - LDAP_CONTEXTSOURCE_USERDN
+      - LDAP_CONTEXTSOURCE_PASSWORD
+      - LDAP_CONTEXTSOURCE_SEARCHBASE
+      - LDAP_CONTEXTSOURCE_SEARCHFILTER
+      - LDAP_CONTEXTSOURCE_ORGANIZATION

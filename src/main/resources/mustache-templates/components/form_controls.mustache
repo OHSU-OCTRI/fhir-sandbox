@@ -1,0 +1,7 @@
+<button type="submit" class="btn btn-primary">Submit</button>
+{{#id}}
+<a href="{{req.contextPath}}{{baseRoute}}/{{id}}" class="btn btn-link">Cancel</a>
+{{/id}}
+{{^id}}
+<a href="{{req.contextPath}}{{baseRoute}}/" class="btn btn-link">Cancel</a>
+{{/id}}

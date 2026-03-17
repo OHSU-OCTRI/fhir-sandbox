@@ -1,0 +1,18 @@
+{{>authlib_fragments/assets}}
+
+<script type="text/javascript" src="{{req.contextPath}}/webjars/jquery-ui/jquery-ui.min.js"></script>
+{{#pageWebjars}}
+    {{! Webjars needed by page-specific scripts can be specified in the view model }}
+    <script type="text/javascript" src="{{req.contextPath}}/webjars/{{.}}"></script>
+{{/pageWebjars}}
+
+{{#pageScripts}}
+    {{! Page-specific scripts can be specified in the view model }}
+    <script type="text/javascript" src="{{req.contextPath}}/assets/js/{{.}}"></script>
+{{/pageScripts}}
+{{#isAdminOrSuper}}
+{{#adminScripts}}
+    <script type="text/javascript" src="{{req.contextPath}}/assets/js/{{.}}"></script>
+{{/adminScripts}}
+{{/isAdminOrSuper}}
+<script type="text/javascript" src="{{req.contextPath}}/assets/js/datepicker.js"></script>
