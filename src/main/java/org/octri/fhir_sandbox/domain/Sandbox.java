@@ -6,6 +6,7 @@ import org.octri.authentication.server.security.entity.User;
 import org.octri.common.domain.AbstractEntity;
 import org.octri.common.view.Labelled;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
@@ -23,7 +24,12 @@ public class Sandbox extends AbstractEntity implements Labelled {
 	private String description;
 
 	@NotNull
-	private String uuid = UUID.randomUUID().toString();
+	@Column(unique = true)
+	private Long serverPartitionId;
+
+	@NotNull
+	@Column(unique = true)
+	private String serverPartitionName = UUID.randomUUID().toString();
 
 	public User getOwner() {
 		return owner;
@@ -41,12 +47,20 @@ public class Sandbox extends AbstractEntity implements Labelled {
 		this.description = description;
 	}
 
-	public String getUuid() {
-		return uuid;
+	public Long getServerPartitionId() {
+		return serverPartitionId;
 	}
 
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
+	public void setServerPartitionId(Long partitionId) {
+		this.serverPartitionId = partitionId;
+	}
+
+	public String getServerPartitionName() {
+		return serverPartitionName;
+	}
+
+	public void setServerPartitionName(String uuid) {
+		this.serverPartitionName = uuid;
 	}
 
 	@Override
@@ -56,8 +70,8 @@ public class Sandbox extends AbstractEntity implements Labelled {
 
 	@Override
 	public String toString() {
-		return "Sandbox [id=" + id + ", owner=" + owner + ", description=" + description + ", uuid=" + uuid
-				+ ", createdAt=" + createdAt + ", updatedAt=" + updatedAt + ", updatedBy=" + updatedBy + "]";
+		return "Sandbox [id=" + id + ", owner=" + owner + ", description=" + description + ", serverPartitionId="
+				+ serverPartitionId + ", serverPartitionName=" + serverPartitionName + "]";
 	}
 
 }

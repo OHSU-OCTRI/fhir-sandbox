@@ -14,10 +14,10 @@
             {{#description}}{{.}}{{/description}}
             {{^description}}<span class="text-muted">None</span>{{/description}}
         </p>
-        <h5>Uuid</h5>
+        <h5>FHIR Server URL</h5>
         <p>
-            {{#uuid}}{{.}}{{/uuid}}
-            {{^uuid}}<span class="text-muted">None</span>{{/uuid}}
+            {{#fhirServerUrl}}{{.}}{{/fhirServerUrl}}
+            {{^fhirServerUrl}}<span class="text-muted">None</span>{{/fhirServerUrl}}
         </p>
         {{>components/show_links}}
         {{/entity}}

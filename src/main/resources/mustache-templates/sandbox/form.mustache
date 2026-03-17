@@ -17,7 +17,8 @@
     <div class="invalid-feedback">Value must be present and at most 200 characters</div>
 </div>
 
-<input type="hidden" id="uuid" name="uuid" value="{{#uuid}}{{.}}{{/uuid}}" required>
+<input type="hidden" id="server_partition_id" name="serverPartitionId" value="{{#serverPartitionId}}{{.}}{{/serverPartitionId}}" required>
+<input type="hidden" id="server_partition_name" name="serverPartitionName" value="{{#serverPartitionName}}{{.}}{{/serverPartitionName}}" required>
 
 {{/entity}}
 {{>components/form_end}}

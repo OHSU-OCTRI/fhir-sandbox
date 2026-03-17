@@ -8,7 +8,6 @@
         <tr>
             <th>Owner</th>
             <th>Description</th>
-            <th>Uuid</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -17,7 +16,6 @@
         <tr>
             <td>{{#owner}}{{label}}{{/owner}}</td>
             <td>{{#description}}{{.}}{{/description}}</td>
-            <td>{{#uuid}}{{.}}{{/uuid}}</td>
             <td>{{>components/list_actions}}</td>
         </tr>
         {{/entity_list}}
