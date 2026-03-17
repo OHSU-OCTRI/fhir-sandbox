@@ -7,7 +7,7 @@ CREATE TABLE `sandbox` (
 	`updated_at` datetime NOT NULL,
 	`updated_by` varchar(320) DEFAULT NULL,
 	`owner` bigint NOT NULL,
-	`description` varchar(255) NOT NULL,
+	`description` varchar(200) NOT NULL,
 	`uuid` varchar(255) NOT NULL,
 	primary key(`id`),
 	CONSTRAINT sandbox_owner_fk FOREIGN KEY (`owner`) REFERENCES `user` (`id`)

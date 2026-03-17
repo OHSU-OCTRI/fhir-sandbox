@@ -13,11 +13,11 @@
 
 <div class="form-group">
     <label for="description" class="form-label required-field">Description</label>
-    <input type="text" class="form-control" id="description" name="description" value="{{#description}}{{.}}{{/description}}" required>
-    <div class="invalid-feedback">Value must be present</div>
+    <input type="text" class="form-control" id="description" name="description" value="{{#description}}{{.}}{{/description}}" required maxlength="200">
+    <div class="invalid-feedback">Value must be present and at most 200 characters</div>
 </div>
 
-    <input type="hidden" id="uuid" name="uuid" value="{{#uuid}}{{.}}{{/uuid}}" required>
+<input type="hidden" id="uuid" name="uuid" value="{{#uuid}}{{.}}{{/uuid}}" required>
 
 {{/entity}}
 {{>components/form_end}}

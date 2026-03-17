@@ -9,6 +9,7 @@ import org.octri.common.view.Labelled;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Sandbox extends AbstractEntity implements Labelled {
@@ -18,6 +19,7 @@ public class Sandbox extends AbstractEntity implements Labelled {
 	private User owner;
 
 	@NotNull
+	@Size(max = 200)
 	private String description;
 
 	@NotNull
