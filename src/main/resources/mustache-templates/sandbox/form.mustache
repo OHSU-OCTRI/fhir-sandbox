@@ -1,0 +1,23 @@
+{{>components/form_start}}
+{{#entity}}
+<div class="form-group">
+    <label for="owner" class="form-label required-field">Owner</label>
+    <select class="form-select" id="owner" name="owner" value="{{#owner}}{{.}}{{/owner}}" required>
+        <option value="">-- Please Select --</option>
+        {{#ownerOptions}}
+        <option value="{{id}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+        {{/ownerOptions}}
+    </select>
+    <div class="invalid-feedback">Value must be present</div>
+</div>
+
+<div class="form-group">
+    <label for="description" class="form-label required-field">Description</label>
+    <input type="text" class="form-control" id="description" name="description" value="{{#description}}{{.}}{{/description}}" required>
+    <div class="invalid-feedback">Value must be present</div>
+</div>
+
+    <input type="hidden" id="uuid" name="uuid" value="{{#uuid}}{{.}}{{/uuid}}" required>
+
+{{/entity}}
+{{>components/form_end}}

@@ -1,0 +1,26 @@
+{{>layout/header}}
+<div class="container">
+    <h1>{{entityName}}</h1>
+    {{>components/messages}}
+    <div>
+        {{#entity}}
+        <h5>Owner</h5>
+        <p>
+            {{#owner}}{{label}}{{/owner}}
+            {{^owner}}<span class="text-muted">None</span>{{/owner}}
+        </p>
+        <h5>Description</h5>
+        <p>
+            {{#description}}{{.}}{{/description}}
+            {{^description}}<span class="text-muted">None</span>{{/description}}
+        </p>
+        <h5>Uuid</h5>
+        <p>
+            {{#uuid}}{{.}}{{/uuid}}
+            {{^uuid}}<span class="text-muted">None</span>{{/uuid}}
+        </p>
+        {{>components/show_links}}
+        {{/entity}}
+    </div>
+</div>
+{{>layout/footer}}
