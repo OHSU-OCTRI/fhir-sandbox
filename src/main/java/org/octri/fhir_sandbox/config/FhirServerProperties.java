@@ -2,7 +2,7 @@ package org.octri.fhir_sandbox.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "octri.fhir")
+@ConfigurationProperties(prefix = "octri.sandbox.fhir")
 public class FhirServerProperties {
 
 	private String baseUrl;
