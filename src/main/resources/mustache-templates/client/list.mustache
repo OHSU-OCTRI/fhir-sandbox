@@ -1,0 +1,35 @@
+{{>layout/header}}
+<div class="container">
+    <h1>Client List</h1>
+    {{>components/messages}}
+    <a href="{{req.contextPath}}/data/client/new" class="new-entity btn btn-success"><i class="fas fa-plus-circle"></i> New</a>
+    <table class="table table-striped table-bordered sorted">
+        <thead>
+        <tr>
+            <th>Client Id</th>
+            <th>Authorization Grant Types</th>
+            <th>Redirect Uris</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#clients}}
+        <tr>
+            <td>{{#clientId}}{{.}}{{/clientId}}</td>
+            <td>{{#authorizationGrantTypes}}{{.}}{{/authorizationGrantTypes}}</td>
+            <td>{{#redirectUris}}{{.}}{{/redirectUris}}</td>
+            <td>
+                {{! TODO: Get FHIR URL from sandbox }}
+                <a href="{{req.contextPath}}/data/client/redirect">Launch</a>
+            </td>
+        </tr>
+        {{/clients}}
+        {{^clients}}
+        <tr>
+            <td colspan="4">No clients found.</td>
+        </tr>
+        {{/clients}}
+        </tbody>
+    </table>
+</div>
+{{>layout/footer}}
