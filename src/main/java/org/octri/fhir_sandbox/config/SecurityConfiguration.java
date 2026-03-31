@@ -1,10 +1,9 @@
-package org.octri.fhir_sandbox;
+package org.octri.fhir_sandbox.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import org.octri.authentication.DefaultSecurityConfigurer;
 import org.octri.authentication.config.AuthenticationRouteProperties;
-import org.octri.fhir_sandbox.config.OAuth2ServerProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
