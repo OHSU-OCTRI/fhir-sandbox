@@ -1,0 +1,16 @@
+{{>components/form_start}}
+{{#entity}}
+
+<input type="hidden" id="owner" name="owner" value="{{#owner}}{{id}}{{/owner}}">
+
+<div class="form-group">
+    <label for="description" class="form-label required-field">{{#i18n}}sandbox.description.label{{/i18n}}</label>
+    <input type="text" class="form-control" id="description" name="description" value="{{#description}}{{.}}{{/description}}" required maxlength="200">
+    <div class="invalid-feedback">{{#i18n}}sandbox.description.validationMessage{{/i18n}}</div>
+</div>
+
+<input type="hidden" id="server_partition_id" name="serverPartitionId" value="{{#serverPartitionId}}{{.}}{{/serverPartitionId}}" required>
+<input type="hidden" id="server_partition_name" name="serverPartitionName" value="{{#serverPartitionName}}{{.}}{{/serverPartitionName}}" required>
+
+{{/entity}}
+{{>components/form_end}}

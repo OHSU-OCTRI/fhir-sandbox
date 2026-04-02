@@ -1,9 +1,0 @@
-{{>layout/header}}
-
-<form name="newClient" method="POST" action="{{req.contextPath}}/data/client/create" class="needs-validation" novalidate>
-	{{ >authlib_fragments/forms/csrf_input }}
-
-	<button type="submit" class="btn btn-primary">Create Client</button>
-</form>
-
-{{>layout/footer}}
