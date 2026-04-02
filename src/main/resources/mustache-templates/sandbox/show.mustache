@@ -4,20 +4,25 @@
     {{>components/messages}}
     <div>
         {{#entity}}
-        <h5>Owner</h5>
+        <h5>{{#i18n}}sandbox.owner.label{{/i18n}}</h5>
         <p>
             {{#owner}}{{label}}{{/owner}}
-            {{^owner}}<span class="text-muted">None</span>{{/owner}}
+            {{^owner}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/owner}}
         </p>
-        <h5>Description</h5>
+        <h5>{{#i18n}}sandbox.description.label{{/i18n}}</h5>
         <p>
             {{#description}}{{.}}{{/description}}
-            {{^description}}<span class="text-muted">None</span>{{/description}}
+            {{^description}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/description}}
         </p>
-        <h5>FHIR Server URL</h5>
+        <h5>{{#i18n}}sandbox.serverPartitionId.label{{/i18n}}</h5>
         <p>
-            {{#fhirServerUrl}}{{.}}{{/fhirServerUrl}}
-            {{^fhirServerUrl}}<span class="text-muted">None</span>{{/fhirServerUrl}}
+            {{#serverPartitionId}}{{.}}{{/serverPartitionId}}
+            {{^serverPartitionId}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/serverPartitionId}}
+        </p>
+        <h5>{{#i18n}}sandbox.serverPartitionName.label{{/i18n}}</h5>
+        <p>
+            {{#serverPartitionName}}{{.}}{{/serverPartitionName}}
+            {{^serverPartitionName}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/serverPartitionName}}
         </p>
         {{>components/show_links}}
         {{/entity}}

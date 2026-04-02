@@ -30,15 +30,13 @@
 				</button>
 				<div class="collapse navbar-collapse" id="navbar_collapse">
 					<ul class="navbar-nav me-auto">
+						{{#isLoggedIn}}
 						<li class="nav-item"><a class="nav-link" href="{{req.contextPath}}/">{{#i18n}}system.nav.home{{/i18n}}</a></li>
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" href="#" id="data_menu" data-bs-toggle="dropdown"
-							role="button" aria-haspopup="true" aria-expanded="false">{{#i18n}}system.nav.data{{/i18n}}</a>
-							<div class="dropdown-menu" aria-labelledby="data_menu">
-								{{>components/data_items}}
-							</div>
-						</li>
-												{{#isAdminOrSuper}}
+						{{/isLoggedIn}}
+					</ul>
+
+					<ul class="navbar-nav">
+						{{#isAdminOrSuper}}
 						<li class="nav-item dropdown">
 							<a class="nav-link dropdown-toggle" href="#" id="admin_menu" data-bs-toggle="dropdown"
 							role="button" aria-haspopup="true" aria-expanded="false">{{#i18n}}system.nav.admin{{/i18n}}</a>
@@ -47,17 +45,15 @@
 								{{>components/admin_items}}
 							</div>
 						</li>
-						<li class="nav-item dropdown">
+						<li class="nav-item dropdown me-2">
 							<a class="nav-link dropdown-toggle" href="#" id="user_management_menu" data-bs-toggle="dropdown"
 							role="button" aria-haspopup="true" aria-expanded="false">{{#i18n}}system.nav.users{{/i18n}}</a>
 							<div class="dropdown-menu" aria-labelledby="user_management_menu">
 								<a class="dropdown-item" href="{{req.contextPath}}/admin/user/new"><span class="fa fa-user-plus"></span> {{#i18n}}system.nav.users.new{{/i18n}}</a>
 								<a class="dropdown-item" href="{{req.contextPath}}/admin/user/list"><span class="fa fa-list"></span> {{#i18n}}system.nav.users.list{{/i18n}}</a>
-							</div></li>
+							</div>
+						</li>
 						{{/isAdminOrSuper}}
-											</ul>
-
-					<ul class="navbar-nav">
 						{{#isLoggedIn}}
 						<li class="nav-item">
 							<a class="nav-link" href="{{req.contextPath}}/logout"><span class="fa fa-power-off"></span> {{#i18n}}system.nav.logout{{/i18n}} ({{username}})</a>

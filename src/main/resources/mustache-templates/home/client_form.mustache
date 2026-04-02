@@ -1,0 +1,44 @@
+{{>components/form_start}}
+{{#entity}}
+
+<input type="hidden" id="sandbox" name="sandbox" value="{{#sandbox}}{{id}}{{/sandbox}}">
+<input type="hidden" id="client_id" name="clientId" value="{{#clientId}}{{.}}{{/clientId}}">
+
+<div class="form-group">
+    <label for="client_type" class="form-label required-field">{{#i18n}}smartClient.clientType.label{{/i18n}}</label>
+    <select class="form-select" id="client_type" name="clientType" value="{{#clientType}}{{.}}{{/clientType}}" required>
+        <option value="">{{#i18n}}system.entity.select{{/i18n}}</option>
+        {{#clientTypes}}
+        <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+        {{/clientTypes}}
+    </select>
+    <div class="invalid-feedback">{{#i18n}}smartClient.clientType.validationMessage{{/i18n}}</div>
+</div>
+
+<div class="form-group">
+    <label for="description" class="form-label required-field">{{#i18n}}smartClient.description.label{{/i18n}}</label>
+    <input type="text" class="form-control" id="description" name="description" value="{{#description}}{{.}}{{/description}}" required maxlength="255">
+    <div class="invalid-feedback">{{#i18n}}smartClient.description.validationMessage{{/i18n}}</div>
+</div>
+
+<div class="form-group">
+    <label for="client_id" class="form-label required-field">{{#i18n}}smartClient.launchUri.label{{/i18n}}</label>
+    <input type="text" class="form-control" id="client_id" name="launchUri" value="{{#launchUri}}{{.}}{{/launchUri}}" required>
+    <div class="invalid-feedback">{{#i18n}}smartClient.launchUri.validationMessage{{/i18n}}</div>
+</div>
+
+<div class="form-group">
+    <label for="redirect_uris" class="form-label required-field">{{#i18n}}smartClient.redirectUris.label{{/i18n}}</label>
+    <input type="text" class="form-control" id="redirect_uris" name="redirectUris" value="{{#redirectUris}}{{.}}{{/redirectUris}}" aria-describedby="redirect_uris_help" required>
+    <div class="invalid-feedback">{{#i18n}}smartClient.redirectUris.validationMessage{{/i18n}}</div>
+    <div id="redirect_uris_help" class="form-text">{{#i18n}}smartClient.redirectUris.help{{/i18n}}</div>
+</div>
+
+<div class="form-group">
+    <label for="scopes" class="form-label required-field">{{#i18n}}smartClient.scopes.label{{/i18n}}</label>
+    <input type="text" class="form-control" id="scopes" name="scopes" value="{{#scopes}}{{.}}{{/scopes}}" aria-describedby="scopes_help" required>
+    <div class="invalid-feedback">{{#i18n}}smartClient.scopes.validationMessage{{/i18n}}</div>
+    <div id="scopes_help" class="form-text">{{#i18n}}smartClient.scopes.help{{/i18n}}</div>
+</div>
+{{/entity}}
+{{>components/form_end}}
