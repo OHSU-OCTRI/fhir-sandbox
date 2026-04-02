@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Manage FHIR server partition corresponding to each sandbox (RFS-237)
 - Add static OAuth client for debugging
 - Add GitHub Actions and Dependabot configuration
+- Add Maven plugins and repository definitions used by workflows
 
 ### Changed
 
