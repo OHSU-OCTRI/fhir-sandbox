@@ -1,0 +1,47 @@
+---
+name: Build
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    types:
+      - opened
+      - edited
+  workflow_dispatch:
+
+jobs:
+  build-java-source:
+    name: Build jar files
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Java environment for GitHub Packages
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Build and test
+        run: mvn package
+
+      - name: Get version from POM
+        id: get-version
+        run: |
+          version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "version=$version" >> $GITHUB_ENV
+
+      - name: Publish to GitHub Packages
+        if: github.ref == 'refs/heads/main' || github.ref_type == 'tag'
+        run: mvn deploy -DskipTests -Pci
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
