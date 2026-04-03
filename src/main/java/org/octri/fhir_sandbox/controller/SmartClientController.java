@@ -13,6 +13,7 @@ import org.octri.fhir_sandbox.repository.SmartClientRepository;
 import org.octri.fhir_sandbox.service.SandboxService;
 import org.octri.fhir_sandbox.service.SmartClientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -85,9 +86,24 @@ public class SmartClientController extends AbstractEntityController<SmartClient,
 	public String update(Map<String, Object> model, @PathVariable Long id,
 			@Valid @ModelAttribute("entity") SmartClient entity, BindingResult bindingResult,
 			RedirectAttributes redirectAttributes) {
-		this.getRepository().save(entity);
+		service.save(entity);
 		redirectAttributes.addFlashAttribute("infoMessage", this.entityName() + " updated.");
 		return showRedirect(id);
+	}
+
+	@Override
+	public String delete(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+		try {
+			service.deleteById(id);
+		} catch (DataIntegrityViolationException e) {
+			String msg = this.entityName() + " is in use and cannot be deleted.";
+			redirectAttributes.addFlashAttribute("errorMessage", msg);
+			return showRedirect(id);
+		}
+
+		String msg = this.entityName() + " with id " + id + " successfully deleted.";
+		redirectAttributes.addFlashAttribute("infoMessage", msg);
+		return listingRedirect();
 	}
 
 	@Override
