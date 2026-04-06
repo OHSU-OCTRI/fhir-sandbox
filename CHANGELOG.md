@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Move `SecurityConfiguration` class to `config` package
+- Upgrade dependencies (common-lib 2.0.0, authlib 4.0.0, DataTables 2)
 
 ### Fixed
 
