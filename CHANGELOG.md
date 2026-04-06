@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add GitHub Actions and Dependabot configuration
 - Add Maven plugins and repository definitions used by workflows
 - Add interface to manage clients (RFS-254)
+- Add private key configuration to application.properties and env.sample (RFS-255)
+- Add instructions on how to configure and run the application (RFS-255)
 
 ### Changed
 

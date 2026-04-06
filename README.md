@@ -13,45 +13,9 @@ This is a [Spring Boot](https://projects.spring.io/spring-boot/) project. It use
 
 When you open the project for the first time with Visual Studio Code, it should offer to install recommended extensions for Java and JavaScript development. To install the extensions manually, open the command palette (CMD-Shift-P), type "recommended", and select the option for "Extensions: Show Recommended Extensions".
 
-### Configuration
+### Running for Local Development
 
-Copy `env.sample` to `.env` and update as needed.
-
-In .env, fill in your LDAP credentials at `YOUR_USERNAME` and `YOUR_PASSWORD`.
-
-LDAP_CONTEXTSOURCE_USERDN=cn=YOUR_USERNAME,ou=User Accounts,dc=ohsum01,dc=ohsu,dc=edu
-LDAP_CONTEXTSOURCE_PASSWORD=YOUR_PASSWORD
-
-## Application Startup
-
-### Running with Docker
-
-Build the project,
-
-```
-mvn clean package
-```
-
-Start the containers, getting mysql up first
-
-```
-docker-compose up -d mysql
-docker-compose up -d app
-```
-
-You should find the app at,
-
-http://localhost:8080/fhir-sandbox
-
-unless you updated `SERVER_SERVLET_CONTEXTPATH`.
-
-### Running with VS Code
-
-There are several ways to run a Spring Boot application using Visual Studio Code. See [Running Spring Boot Applications with VS Code](https://octri.ohsu.edu/wiki/display/TKB/Running+Spring+Boot+Applications+With+VS+Code) for examples.
-
-### Running with Eclipse
-
-See [Running Spring Boot Applications with Eclipse](https://octri.ohsu.edu/wiki/display/ORDS/Running+Spring+Boot+Applications+with+Spring+Tool+Suite) for a complete guide.
+See [RUNNING.md][./RUNNING.md] for instructions on how to configure and run the application for local development.
 
 ## Front End
 

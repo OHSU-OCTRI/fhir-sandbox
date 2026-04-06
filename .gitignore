@@ -38,8 +38,10 @@ bundle-stats.json
 mvnw
 mvnw.cmd
 
+# Data and secrets
 .env
 docker_data/
+*.pem
 
 # Config
 dev.properties
