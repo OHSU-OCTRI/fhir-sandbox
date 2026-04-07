@@ -15,7 +15,7 @@ When you open the project for the first time with Visual Studio Code, it should 
 
 ### Running for Local Development
 
-See [RUNNING.md][./RUNNING.md] for instructions on how to configure and run the application for local development.
+See [RUNNING.md](./RUNNING.md) for instructions on how to configure and run the application for local development.
 
 ## Front End
 
