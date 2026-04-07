@@ -59,5 +59,8 @@ After a few seconds, the application should be running here:
 
 http://localhost:8080/fhir-sandbox/
 
+The first time that you run the application, you will also need to populate the `user` table before you can log in. You can use the [add_users.sql] script to add OCTRI's standard user accounts.
+
 
 [OHSU-OCTRI/fhir-sandbox-backend]: https://github.com/OHSU-OCTRI/fhir-sandbox-backend
+[add_users.sql]: https://source.ohsu.edu/OCTRI-Apps/auth-default-users/blob/master/sql/add_users.sql
