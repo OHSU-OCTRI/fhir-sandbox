@@ -55,7 +55,7 @@ public class SecurityConfiguration {
 
 		http
 				.securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
-				.with(authorizationServerConfigurer, withDefaults())
+				.with(authorizationServerConfigurer, (authorizationServer) -> authorizationServer.oidc(withDefaults()))
 				.authorizeHttpRequests((authorize) -> authorize
 						.anyRequest().authenticated())
 				.exceptionHandling((exceptions) -> exceptions
