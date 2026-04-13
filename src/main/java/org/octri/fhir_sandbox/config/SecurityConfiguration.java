@@ -117,8 +117,7 @@ public class SecurityConfiguration {
 		CorsConfiguration config = new CorsConfiguration();
 		config.addAllowedHeader("*");
 		config.addAllowedMethod("*");
-		config.addAllowedOrigin("http://localhost:8086");
-		config.addAllowedOrigin("http://localhost:5173");
+		config.addAllowedOriginPattern("http://localhost:*");
 		config.setAllowCredentials(true);
 		source.registerCorsConfiguration("/**", config);
 		return source;

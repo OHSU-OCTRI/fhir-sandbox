@@ -26,7 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Move `SecurityConfiguration` class to `config` package
 - Upgrade dependencies (common-lib 2.0.0, authlib 4.0.0, DataTables 2)
-- Change default ports for app and backend to avoid conflicts with existing apps 
+- Change default ports for app and backend to avoid conflicts with existing apps
+- Localhost wildcard CORS configuration (RFS-255)
 
 ### Fixed
 
