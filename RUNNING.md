@@ -57,7 +57,7 @@ Start the application using Visual Studio Code (e.g. using the Spring Boot Dashb
 
 After a few seconds, the application should be running here:
 
-http://localhost:8080/fhir-sandbox/
+http://localhost:8081/fhir-sandbox/
 
 The first time that you run the application, you will also need to populate the `user` table before you can log in. You can use the [add_users.sql] script to add OCTRI's standard user accounts.
 
