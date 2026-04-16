@@ -7,9 +7,9 @@
         <thead>
         <tr>
             <th>{{#i18n}}smartClient.sandbox.label{{/i18n}}</th>
-            <th>{{#i18n}}smartClient.description.label{{/i18n}}</th>
             <th>{{#i18n}}smartClient.clientType.label{{/i18n}}</th>
             <th>{{#i18n}}smartClient.clientId.label{{/i18n}}</th>
+            <th>{{#i18n}}smartClient.name.label{{/i18n}}</th>
             <th>{{#i18n}}system.entity.actions{{/i18n}}</th>
         </tr>
         </thead>
@@ -17,9 +17,9 @@
         {{#entity_list}}
         <tr>
             <td>{{#sandbox}}{{label}}{{/sandbox}}</td>
-            <td>{{#description}}{{.}}{{/description}}</td>
             <td>{{#clientType}}{{.}}{{/clientType}}</td>
             <td>{{#clientId}}{{.}}{{/clientId}}</td>
+            <td>{{#name}}{{.}}{{/name}}</td>
             <td>{{>components/list_actions}}</td>
         </tr>
         {{/entity_list}}
