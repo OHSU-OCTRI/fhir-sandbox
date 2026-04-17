@@ -71,30 +71,26 @@ public class JpaOAuth2AuthorizationService implements OAuth2AuthorizationService
 
 	@Override
 	public void save(OAuth2Authorization authorization) {
-		log.info("save: authorization={}", authorization);
+		log.debug("save: authorization={}", authorization);
 		Assert.notNull(authorization, "authorization cannot be null");
 		this.authorizationRepository.save(toEntity(authorization));
 	}
 
 	@Override
 	public void remove(OAuth2Authorization authorization) {
-		log.info("remove: authorization={}", authorization);
 		Assert.notNull(authorization, "authorization cannot be null");
 		this.authorizationRepository.deleteById(authorization.getId());
 	}
 
 	@Override
 	public OAuth2Authorization findById(String id) {
-		log.info("findById: id={}", id);
 		Assert.hasText(id, "id cannot be empty");
 		var result = this.authorizationRepository.findById(id).map(this::toObject).orElse(null);
-		log.info("findById: result={}", result);
 		return result;
 	}
 
 	@Override
 	public OAuth2Authorization findByToken(String token, OAuth2TokenType tokenType) {
-		log.info("findByToken: token={}, tokenType={}", token, tokenType);
 		Assert.hasText(token, "token cannot be empty");
 
 		Optional<Authorization> result;

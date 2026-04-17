@@ -28,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgrade dependencies (common-lib 2.0.0, authlib 4.0.0, DataTables 2)
 - Change default ports for app and backend to avoid conflicts with existing apps
 - Localhost wildcard CORS configuration (RFS-255)
+- Merged `SmartClient` and `Client` entities to resolve update anomalies (RFS-277)
+- Increased the maximum size of SMART client scopes (RFS-271)
 
 ### Fixed
 

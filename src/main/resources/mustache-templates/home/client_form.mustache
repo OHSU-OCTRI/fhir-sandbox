@@ -16,14 +16,19 @@
 </div>
 
 <div class="form-group">
-    <label for="description" class="form-label required-field">{{#i18n}}smartClient.description.label{{/i18n}}</label>
-    <input type="text" class="form-control" id="description" name="description" value="{{#description}}{{.}}{{/description}}" required maxlength="255">
-    <div class="invalid-feedback">{{#i18n}}smartClient.description.validationMessage{{/i18n}}</div>
+    <label for="name" class="form-label required-field">{{#i18n}}smartClient.name.label{{/i18n}}</label>
+    <input type="text" class="form-control" id="name" name="name" value="{{#name}}{{.}}{{/name}}" maxlength="255" required>
+    <div class="invalid-feedback">{{#i18n}}smartClient.name.validationMessage{{/i18n}}</div>
 </div>
 
 <div class="form-group">
-    <label for="client_id" class="form-label required-field">{{#i18n}}smartClient.launchUri.label{{/i18n}}</label>
-    <input type="text" class="form-control" id="client_id" name="launchUri" value="{{#launchUri}}{{.}}{{/launchUri}}" required>
+    <label for="description" class="form-label">{{#i18n}}smartClient.description.label{{/i18n}}</label>
+    <textarea id="description" class="form-control" name="description" rows="4" maxlength="1000">{{#description}}{{.}}{{/description}}</textarea>
+</div>
+
+<div class="form-group">
+    <label for="launch_uri" class="form-label required-field">{{#i18n}}smartClient.launchUri.label{{/i18n}}</label>
+    <input type="text" class="form-control" id="launch_uri" name="launchUri" value="{{#launchUri}}{{.}}{{/launchUri}}" maxlength="1000" required>
     <div class="invalid-feedback">{{#i18n}}smartClient.launchUri.validationMessage{{/i18n}}</div>
 </div>
 
@@ -36,7 +41,7 @@
 
 <div class="form-group">
     <label for="scopes" class="form-label required-field">{{#i18n}}smartClient.scopes.label{{/i18n}}</label>
-    <input type="text" class="form-control" id="scopes" name="scopes" value="{{#scopes}}{{.}}{{/scopes}}" aria-describedby="scopes_help" required>
+    <input type="text" class="form-control" id="scopes" name="scopes" value="{{#scopes}}{{.}}{{/scopes}}" aria-describedby="scopes_help" maxlength="2000" required>
     <div class="invalid-feedback">{{#i18n}}smartClient.scopes.validationMessage{{/i18n}}</div>
     <div id="scopes_help" class="form-text">{{#i18n}}smartClient.scopes.help{{/i18n}}</div>
 </div>

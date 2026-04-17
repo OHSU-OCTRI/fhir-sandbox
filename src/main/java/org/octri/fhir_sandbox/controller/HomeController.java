@@ -12,6 +12,8 @@ import org.octri.fhir_sandbox.domain.Sandbox;
 import org.octri.fhir_sandbox.domain.SmartClient;
 import org.octri.fhir_sandbox.service.SandboxService;
 import org.octri.fhir_sandbox.service.SmartClientService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,6 +34,8 @@ import jakarta.validation.Valid;
  */
 @RestController
 public class HomeController {
+
+	private static final Logger log = LoggerFactory.getLogger(HomeController.class);
 
 	private static final String BASE_ROUTE = "/sandboxes";
 
@@ -206,6 +210,7 @@ public class HomeController {
 		model.put("baseRoute", BASE_ROUTE);
 		model.put("entityName", "Client");
 		model.put("submitAction", clientFormAction(sandbox, client));
+		model.put("cancelAction", BASE_ROUTE + "/" + sandbox.getId());
 		model.put("clientTypes", OptionList.fromEnum(EnumSet.allOf(ClientType.class), client.getClientType()));
 		model.put("sandbox", sandbox);
 	}
