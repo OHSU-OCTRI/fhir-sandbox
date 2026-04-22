@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add private key configuration to application.properties and env.sample (RFS-255)
 - Add instructions on how to configure and run the application (RFS-255)
 - Add initial OpenID Connect support (RFS-275)
+- Add initial SMART launch context support (RFS-278)
 
 ### Changed
 

@@ -1,12 +1,19 @@
 package org.octri.fhir_sandbox.config;
 
 import java.nio.charset.StandardCharsets;
+import java.util.function.Consumer;
 
+import org.octri.fhir_sandbox.oauth2.customizer.SmartLaunchContextTokenResponseCustomizer;
+import org.octri.fhir_sandbox.repository.SmartLaunchContextRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AccessTokenAuthenticationContext;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.util.Assert;
 
@@ -22,10 +29,11 @@ import com.nimbusds.jose.proc.SecurityContext;
 @EnableConfigurationProperties(OAuth2ServerProperties.class)
 public class OAuth2ServerConfig {
 
-	private final OAuth2ServerProperties oAuth2Properties;
+	private final Logger log = LoggerFactory.getLogger(getClass());
+	private final OAuth2ServerProperties oauth2Properties;
 
-	public OAuth2ServerConfig(OAuth2ServerProperties oAuth2Properties) {
-		this.oAuth2Properties = oAuth2Properties;
+	public OAuth2ServerConfig(OAuth2ServerProperties oauth2Properties) {
+		this.oauth2Properties = oauth2Properties;
 	}
 
 	/**
@@ -35,7 +43,7 @@ public class OAuth2ServerConfig {
 	 */
 	@Bean
 	public JWKSource<SecurityContext> jwkSource() {
-		JWK privateKey = readPrivateKey(oAuth2Properties.getPrivateKeyLocation());
+		JWK privateKey = readPrivateKey(oauth2Properties.getPrivateKeyLocation());
 		JWKSet jwkSet = new JWKSet(privateKey);
 		return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
 	}
@@ -59,6 +67,20 @@ public class OAuth2ServerConfig {
 	@Bean
 	public OAuth2AuthorizationServerConfiguration authorizationServerConfiguration() {
 		return new OAuth2AuthorizationServerConfiguration();
+	}
+
+	/**
+	 * Provides a customizer that adds SMART app launch context to the OAuth 2.0 token response.
+	 *
+	 * @param oauth2AuthorizationService
+	 *            service used to look up OAuth 2.0 client authorizations
+	 * @return
+	 */
+	@Bean
+	public Consumer<OAuth2AccessTokenAuthenticationContext> tokenResponseCustomizer(
+			OAuth2AuthorizationService oauth2AuthorizationService,
+			SmartLaunchContextRepository smartLaunchContextRepository) {
+		return new SmartLaunchContextTokenResponseCustomizer(oauth2AuthorizationService, smartLaunchContextRepository);
 	}
 
 	/**
