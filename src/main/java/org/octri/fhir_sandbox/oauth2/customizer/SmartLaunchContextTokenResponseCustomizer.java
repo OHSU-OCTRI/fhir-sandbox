@@ -1,5 +1,6 @@
 package org.octri.fhir_sandbox.oauth2.customizer;
 
+import java.util.HashMap;
 import java.util.function.Consumer;
 
 import org.octri.fhir_sandbox.repository.SmartLaunchContextRepository;
@@ -35,8 +36,11 @@ public class SmartLaunchContextTokenResponseCustomizer implements Consumer<OAuth
 		Assert.isTrue(authentication instanceof OAuth2AccessTokenAuthenticationToken,
 				"Unexpected Authentication type: " + authentication.getClass().getSimpleName());
 
-		var tokenStr = ((OAuth2AccessTokenAuthenticationToken) authentication).getAccessToken().getTokenValue();
-		var authorization = oauth2AuthorizationService.findByToken(tokenStr, OAuth2TokenType.ACCESS_TOKEN);
+		var authenticationToken = (OAuth2AccessTokenAuthenticationToken) authentication;
+		var tokenResponseAdditionalParams = authenticationToken.getAdditionalParameters();
+
+		var accessTokenStr = ((OAuth2AccessTokenAuthenticationToken) authentication).getAccessToken().getTokenValue();
+		var authorization = oauth2AuthorizationService.findByToken(accessTokenStr, OAuth2TokenType.ACCESS_TOKEN);
 		Assert.notNull(authorization, "Authorization not found for authentication token");
 
 		var authRequest = authorization.getAttributes()
@@ -46,8 +50,8 @@ public class SmartLaunchContextTokenResponseCustomizer implements Consumer<OAuth
 		Assert.isTrue(authRequest instanceof OAuth2AuthorizationRequest,
 				"Expected OAuth2Authorization request, but found " + authRequest.getClass().getName());
 
-		var additionalParams = ((OAuth2AuthorizationRequest) authRequest).getAdditionalParameters();
-		var launchId = additionalParams.get(LAUNCH_PARAMETER_NAME);
+		var authRequestAdditionalParams = ((OAuth2AuthorizationRequest) authRequest).getAdditionalParameters();
+		var launchId = authRequestAdditionalParams.get(LAUNCH_PARAMETER_NAME);
 		var clientId = authorization.getRegisteredClientId();
 		log.debug("Launch context ID for authorization {}: {}", authorization.getId(), launchId);
 		if (launchId == null) {
@@ -57,9 +61,16 @@ public class SmartLaunchContextTokenResponseCustomizer implements Consumer<OAuth
 
 		var optContext = smartLaunchContextRepository.findByOpaqueIdAndClientId((String) launchId, clientId);
 		Assert.isTrue(optContext.isPresent(), "Launch context " + launchId + " not found for client " + clientId);
-		var params = optContext.get().getAttributes();
+		var attrs = optContext.get().getAttributes();
+
+		// merge the access token response's additional parameters with the launch context to avoid losing
+		// the ID token
+		var mergedParams = new HashMap<String, Object>();
+		mergedParams.putAll(tokenResponseAdditionalParams);
+		mergedParams.putAll(attrs);
+
 		context.getAccessTokenResponse()
-				.additionalParameters(params);
+				.additionalParameters(mergedParams);
 	}
 
 }
