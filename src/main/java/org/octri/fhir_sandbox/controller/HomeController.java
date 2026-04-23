@@ -1,21 +1,26 @@
 package org.octri.fhir_sandbox.controller;
 
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 import org.octri.authentication.server.security.SecurityHelper;
 import org.octri.authentication.server.security.service.UserService;
 import org.octri.common.view.OptionList;
+import org.octri.common.view.ViewUtils;
 import org.octri.fhir_sandbox.domain.ClientType;
 import org.octri.fhir_sandbox.domain.Sandbox;
 import org.octri.fhir_sandbox.domain.SmartClient;
+import org.octri.fhir_sandbox.domain.SmartLaunchContextRequest;
 import org.octri.fhir_sandbox.service.SandboxService;
 import org.octri.fhir_sandbox.service.SmartClientService;
+import org.octri.fhir_sandbox.service.SmartLaunchContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.Assert;
 import org.springframework.validation.BindingResult;
@@ -23,6 +28,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -39,14 +45,22 @@ public class HomeController {
 
 	private static final String BASE_ROUTE = "/sandboxes";
 
-	@Autowired
-	private UserService userService;
+	private final UserService userService;
+	private final SandboxService sandboxService;
+	private final SmartClientService clientService;
+	private final SmartLaunchContextService launchContextService;
 
-	@Autowired
-	private SandboxService sandboxService;
+	// TODO: RFS-249 remove stub patient
+	@Value("${octri.sandbox.stub-patient.id}")
+	private String stubPatientId;
 
-	@Autowired
-	private SmartClientService clientService;
+	public HomeController(UserService userService, SandboxService sandboxService, SmartClientService clientService,
+			SmartLaunchContextService launchContextService) {
+		this.userService = userService;
+		this.sandboxService = sandboxService;
+		this.clientService = clientService;
+		this.launchContextService = launchContextService;
+	}
 
 	@GetMapping("/")
 	public ModelAndView welcome(Map<String, Object> model) {
@@ -106,11 +120,14 @@ public class HomeController {
 		var sandbox = sandboxService.findById(id).get();
 		var clients = sandboxService.getClientsForSandbox(sandbox);
 
+		ViewUtils.addPageScript(model, "launch-client.js");
 		model.put("baseRoute", BASE_ROUTE);
 		model.put("entity", sandbox);
 		model.put("fhirServerUrl", sandboxService.getSandboxFhirUrl(sandbox));
 		model.put("clients", clients);
 		model.put("hasClients", !clients.isEmpty());
+		// TODO: RFS-249 remove stub patient ID
+		model.put("stubPatientId", stubPatientId);
 
 		return new ModelAndView("home/sandbox_details", model);
 	}
@@ -197,6 +214,27 @@ public class HomeController {
 		clientService.delete(client);
 		redirectAttributes.addFlashAttribute("successMessage", "Client successfully deleted.");
 		return new ModelAndView("redirect:/sandboxes/" + sandboxId);
+	}
+
+	@PostMapping(value = "/create_context", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Map<String, Object> createLaunchContext(@RequestBody SmartLaunchContextRequest payload) {
+		var response = new HashMap<String, Object>();
+
+		if (payload.clientId() == null) {
+			response.put("error", "Client ID");
+			return response;
+		}
+
+		if (payload.patientId() == null && payload.encounterId() == null) {
+			response.put("error", "Either patient ID or encounter ID is required");
+			return response;
+		}
+
+		var context = launchContextService.createLaunchContext(payload.clientId(), payload.patientId(),
+				payload.encounterId());
+		response.put("id", context.getOpaqueId());
+
+		return response;
 	}
 
 	private void setupClientForm(Map<String, Object> model, Sandbox sandbox, SmartClient client) {
