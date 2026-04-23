@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Localhost wildcard CORS configuration (RFS-255)
 - Merged `SmartClient` and `Client` entities to resolve update anomalies (RFS-277)
 - Increased the maximum size of SMART client scopes (RFS-271)
+- Enabled asynchronous processing (RFS-272)
 
 ### Fixed
 
