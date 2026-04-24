@@ -3,6 +3,7 @@ package org.octri.fhir_sandbox.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeType;
 import org.hl7.fhir.r4.model.IntegerType;
 import org.hl7.fhir.r4.model.Parameters;
@@ -13,6 +14,8 @@ import org.octri.fhir_sandbox.domain.Sandbox;
 import org.octri.fhir_sandbox.domain.SmartClient;
 import org.octri.fhir_sandbox.repository.SandboxRepository;
 import org.octri.fhir_sandbox.repository.SmartClientRepository;
+import org.octri.fhir_sandbox.util.AsyncDataUtil;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -28,13 +31,15 @@ public class SandboxService {
 	private final SmartClientRepository sandboxClientRepository;
 	private final FhirServerProperties fhirServerProperties;
 	private final FhirContext fhirContext;
+	private final SampleDataService sampleDataService;
 
 	public SandboxService(SandboxRepository repository, SmartClientRepository sandboxClientRepository,
-			FhirServerProperties fhirServerProperties, FhirContext fhirContext) {
+			FhirServerProperties fhirServerProperties, FhirContext fhirContext, SampleDataService sampleDataService) {
 		this.repository = repository;
 		this.sandboxClientRepository = sandboxClientRepository;
 		this.fhirServerProperties = fhirServerProperties;
 		this.fhirContext = fhirContext;
+		this.sampleDataService = sampleDataService;
 	}
 
 	/**
@@ -128,6 +133,24 @@ public class SandboxService {
 	public void deleteById(Long id) {
 		var sandbox = repository.findById(id).get();
 		delete(sandbox);
+	}
+
+	/**
+	 * Loads sample FHIR resources then posts them to the FHIR server
+	 * 
+	 * @param sandbox
+	 */
+	@Async
+	public void loadSampleData(Sandbox sandbox) {
+		var sampleData = AsyncDataUtil.tryGetFutureOrNull(sampleDataService.getAllSampleBundles(fhirContext));
+		var fhirClient = fhirContext.newRestfulGenericClient(getSandboxFhirUrl(sandbox));
+		for (var bundle : sampleData) {
+			Bundle resp = fhirClient
+					.transaction()
+					.withBundle(bundle)
+					.execute();
+			// TODO: check and handle errors
+		}
 	}
 
 	/**
