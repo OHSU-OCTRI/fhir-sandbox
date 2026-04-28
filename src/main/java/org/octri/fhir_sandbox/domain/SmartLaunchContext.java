@@ -20,6 +20,10 @@ import jakarta.validation.constraints.NotNull;
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = { "opaque_id", "client_id" }) })
 public class SmartLaunchContext extends AbstractEntity {
 
+	public static final String PATIENT_ATTRIBUTE = "patient";
+	public static final String ENCOUNTER_ATTRIBUTE = "encounter";
+	public static final String FHIR_USER_ATTRIBUTE = "fhirUser";
+
 	@NotNull
 	private String opaqueId;
 
@@ -51,6 +55,34 @@ public class SmartLaunchContext extends AbstractEntity {
 
 	public void setAttributes(Map<String, Object> attributes) {
 		this.attributes = attributes;
+	}
+
+	public Object getAttribute(String attributeName) {
+		return attributes.get(attributeName);
+	}
+
+	public void setPatientAttribute(String patientId) {
+		attributes.put(PATIENT_ATTRIBUTE, patientId);
+	}
+
+	public Object getPatientAttribute() {
+		return attributes.get(PATIENT_ATTRIBUTE);
+	}
+
+	public void setEncounterAttribute(String encounterId) {
+		attributes.put(ENCOUNTER_ATTRIBUTE, encounterId);
+	}
+
+	public Object getEncounterAttribute() {
+		return attributes.get(ENCOUNTER_ATTRIBUTE);
+	}
+
+	public void setFhirUserAttribute(String fhirUser) {
+		attributes.put(FHIR_USER_ATTRIBUTE, fhirUser);
+	}
+
+	public Object getFhirUserAttribute() {
+		return attributes.get(FHIR_USER_ATTRIBUTE);
 	}
 
 }

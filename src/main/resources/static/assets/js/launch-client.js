@@ -5,7 +5,7 @@
     buttons.forEach(function (btn) {
       btn.addEventListener('click', function (evt) {
         evt.preventDefault();
-        const { clientId, patientId, launchUrl } = this.dataset;
+        const { clientId, patientId, launchUrl, fhirUser } = this.dataset;
         const contextPath = document
           .querySelector('meta[name="ctx"]')
           ?.getAttribute('content');
@@ -14,7 +14,7 @@
           ?.getAttribute('content');
 
         if (!clientId || !patientId || !launchUrl) {
-          console.error('Request parameters not present');
+          console.error('Required request parameters are missing');
           return;
         }
 
@@ -28,6 +28,11 @@
           return;
         }
 
+        const requestBody = { clientId, patientId };
+        if (fhirUser) {
+          requestBody.fhirUser = fhirUser;
+        }
+
         fetch(`${contextPath}create_context`, {
           method: 'POST',
           credentials: 'same-origin',
@@ -35,7 +40,7 @@
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': csrfToken
           },
-          body: JSON.stringify({ clientId, patientId })
+          body: JSON.stringify(requestBody)
         })
           .then(response => response.json())
           .then(json => {
