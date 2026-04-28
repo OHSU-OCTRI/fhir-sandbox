@@ -3,10 +3,10 @@ package org.octri.fhir_sandbox.oauth2.customizer;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
-import org.octri.fhir_sandbox.repository.SmartLaunchContextRepository;
+import org.octri.fhir_sandbox.oauth2.utils.OAuthUtils;
+import org.octri.fhir_sandbox.service.SmartLaunchContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.OAuth2TokenType;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AccessTokenAuthenticationContext;
@@ -18,16 +18,14 @@ import org.springframework.util.Assert;
  */
 public class SmartLaunchContextTokenResponseCustomizer implements Consumer<OAuth2AccessTokenAuthenticationContext> {
 
-	private static final String LAUNCH_PARAMETER_NAME = "launch";
-
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	private final OAuth2AuthorizationService oauth2AuthorizationService;
-	private final SmartLaunchContextRepository smartLaunchContextRepository;
+	private final SmartLaunchContextService smartLaunchContextService;
 
 	public SmartLaunchContextTokenResponseCustomizer(OAuth2AuthorizationService oauth2AuthorizationService,
-			SmartLaunchContextRepository smartLaunchContextRepository) {
+			SmartLaunchContextService smartLaunchContextService) {
 		this.oauth2AuthorizationService = oauth2AuthorizationService;
-		this.smartLaunchContextRepository = smartLaunchContextRepository;
+		this.smartLaunchContextService = smartLaunchContextService;
 	}
 
 	@Override
@@ -43,15 +41,7 @@ public class SmartLaunchContextTokenResponseCustomizer implements Consumer<OAuth
 		var authorization = oauth2AuthorizationService.findByToken(accessTokenStr, OAuth2TokenType.ACCESS_TOKEN);
 		Assert.notNull(authorization, "Authorization not found for authentication token");
 
-		var authRequest = authorization.getAttributes()
-				.get(OAuth2AuthorizationRequest.class.getCanonicalName());
-		Assert.notNull(authRequest,
-				"No authorization request found in attributes for authorization " + authorization.getId());
-		Assert.isTrue(authRequest instanceof OAuth2AuthorizationRequest,
-				"Expected OAuth2Authorization request, but found " + authRequest.getClass().getName());
-
-		var authRequestAdditionalParams = ((OAuth2AuthorizationRequest) authRequest).getAdditionalParameters();
-		var launchId = authRequestAdditionalParams.get(LAUNCH_PARAMETER_NAME);
+		var launchId = OAuthUtils.getLaunchIdFromAuthorization(authorization);
 		var clientId = authorization.getRegisteredClientId();
 		log.debug("Launch context ID for authorization {}: {}", authorization.getId(), launchId);
 		if (launchId == null) {
@@ -59,7 +49,7 @@ public class SmartLaunchContextTokenResponseCustomizer implements Consumer<OAuth
 			return;
 		}
 
-		var optContext = smartLaunchContextRepository.findByOpaqueIdAndClientId((String) launchId, clientId);
+		var optContext = smartLaunchContextService.findByOpaqueIdAndClientId((String) launchId, clientId);
 		Assert.isTrue(optContext.isPresent(), "Launch context " + launchId + " not found for client " + clientId);
 		var attrs = optContext.get().getAttributes();
 

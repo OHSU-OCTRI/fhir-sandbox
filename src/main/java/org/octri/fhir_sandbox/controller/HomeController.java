@@ -12,7 +12,7 @@ import org.octri.common.view.ViewUtils;
 import org.octri.fhir_sandbox.domain.ClientType;
 import org.octri.fhir_sandbox.domain.Sandbox;
 import org.octri.fhir_sandbox.domain.SmartClient;
-import org.octri.fhir_sandbox.domain.SmartLaunchContextRequest;
+import org.octri.fhir_sandbox.domain.SmartLaunchContextProperties;
 import org.octri.fhir_sandbox.service.SandboxService;
 import org.octri.fhir_sandbox.service.SmartClientService;
 import org.octri.fhir_sandbox.service.SmartLaunchContextService;
@@ -50,9 +50,12 @@ public class HomeController {
 	private final SmartClientService clientService;
 	private final SmartLaunchContextService launchContextService;
 
-	// TODO: RFS-249 remove stub patient
-	@Value("${octri.sandbox.stub-patient.id}")
+	// TODO: RFS-249 remove stub IDs
+	@Value("${octri.sandbox.stub-id.patient}")
 	private String stubPatientId;
+
+	@Value("${octri.sandbox.stub-id.practitioner}")
+	private String stubPractitionerId;
 
 	public HomeController(UserService userService, SandboxService sandboxService, SmartClientService clientService,
 			SmartLaunchContextService launchContextService) {
@@ -126,8 +129,9 @@ public class HomeController {
 		model.put("fhirServerUrl", sandboxService.getSandboxFhirUrl(sandbox));
 		model.put("clients", clients);
 		model.put("hasClients", !clients.isEmpty());
-		// TODO: RFS-249 remove stub patient ID
+		// TODO: RFS-249 remove stub IDs
 		model.put("stubPatientId", stubPatientId);
+		model.put("stubPractitionerId", stubPractitionerId);
 
 		return new ModelAndView("home/sandbox_details", model);
 	}
@@ -217,7 +221,7 @@ public class HomeController {
 	}
 
 	@PostMapping(value = "/create_context", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Map<String, Object> createLaunchContext(@RequestBody SmartLaunchContextRequest payload) {
+	public Map<String, Object> createLaunchContext(@RequestBody SmartLaunchContextProperties payload) {
 		var response = new HashMap<String, Object>();
 
 		if (payload.clientId() == null) {
@@ -230,8 +234,7 @@ public class HomeController {
 			return response;
 		}
 
-		var context = launchContextService.createLaunchContext(payload.clientId(), payload.patientId(),
-				payload.encounterId());
+		var context = launchContextService.createLaunchContext(payload);
 		response.put("id", context.getOpaqueId());
 
 		return response;

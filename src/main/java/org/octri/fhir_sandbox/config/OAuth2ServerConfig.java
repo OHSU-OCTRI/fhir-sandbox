@@ -3,8 +3,9 @@ package org.octri.fhir_sandbox.config;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
+import org.octri.fhir_sandbox.oauth2.customizer.SmartLaunchContextIdTokenCustomizer;
 import org.octri.fhir_sandbox.oauth2.customizer.SmartLaunchContextTokenResponseCustomizer;
-import org.octri.fhir_sandbox.repository.SmartLaunchContextRepository;
+import org.octri.fhir_sandbox.service.SmartLaunchContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -15,6 +16,8 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AccessTokenAuthenticationContext;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
+import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.util.Assert;
 
 import com.nimbusds.jose.jwk.JWK;
@@ -74,13 +77,28 @@ public class OAuth2ServerConfig {
 	 *
 	 * @param oauth2AuthorizationService
 	 *            service used to look up OAuth 2.0 client authorizations
+	 * @param smartLaunchContextService
+	 *            service used to look up SMART app launch context information
 	 * @return
 	 */
 	@Bean
 	public Consumer<OAuth2AccessTokenAuthenticationContext> tokenResponseCustomizer(
 			OAuth2AuthorizationService oauth2AuthorizationService,
-			SmartLaunchContextRepository smartLaunchContextRepository) {
-		return new SmartLaunchContextTokenResponseCustomizer(oauth2AuthorizationService, smartLaunchContextRepository);
+			SmartLaunchContextService smartLaunchContextService) {
+		return new SmartLaunchContextTokenResponseCustomizer(oauth2AuthorizationService, smartLaunchContextService);
+	}
+
+	/**
+	 * Provides a customizer that adds SMART app <code>fhirUser</code> context to the OIDC ID token.
+	 *
+	 * @param smartLaunchContextService
+	 *            service used to look up SMART app launch context information
+	 * @return
+	 */
+	@Bean
+	public OAuth2TokenCustomizer<JwtEncodingContext> idTokenCustomizer(
+			SmartLaunchContextService smartLaunchContextService) {
+		return new SmartLaunchContextIdTokenCustomizer(smartLaunchContextService);
 	}
 
 	/**

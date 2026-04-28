@@ -40,8 +40,8 @@
 				<td>{{clientId}}</td>
 				<td>{{launchUri}}</td>
 				<td>
-					{{! TODO: RFS-249 remove stub patient ID }}
-					<a href="#" role="button" class="client-launch" data-client-id="{{clientId}}" data-patient-id="{{stubPatientId}}" data-launch-url="{{launchUri}}?iss={{fhirServerUrl}}">{{#i18n}}smartClient.actions.launch{{/i18n}}</a>
+					{{! TODO: RFS-249 remove stub IDs }}
+					<a href="#" role="button" class="client-launch" data-client-id="{{clientId}}" data-patient-id="{{stubPatientId}}" data-fhir-user="{{stubPractitionerId}}" data-launch-url="{{launchUri}}?iss={{fhirServerUrl}}">{{#i18n}}smartClient.actions.launch{{/i18n}}</a>
 					<a href="{{req.contextPath}}{{baseRoute}}/{{sandbox.id}}/client/{{id}}/edit">{{#i18n}}system.entity.edit{{/i18n}}</a>
 					<a href="{{req.contextPath}}{{baseRoute}}/{{sandbox.id}}/client/{{id}}/delete" class="text-danger" onclick="return confirm('{{#i18n}}smartClient.actions.deleteMessage{{/i18n}}');">{{#i18n}}system.entity.delete{{/i18n}}</a>
 				</td>
