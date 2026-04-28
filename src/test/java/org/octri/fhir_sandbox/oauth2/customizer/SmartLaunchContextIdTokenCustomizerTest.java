@@ -26,6 +26,8 @@ import org.springframework.security.oauth2.server.authorization.token.JwtEncodin
 @ExtendWith(MockitoExtension.class)
 public class SmartLaunchContextIdTokenCustomizerTest {
 
+	private static final String MOCK_CLIENT_ID = "mock-client-id";
+
 	@Mock
 	private SmartLaunchContextService service;
 
@@ -48,7 +50,7 @@ public class SmartLaunchContextIdTokenCustomizerTest {
 	private OAuth2AuthorizationRequest buildAuthRequest(Map<String, Object> additionalParams) {
 		return OAuth2AuthorizationRequest.authorizationCode()
 				.authorizationUri("https://example.com/oauth2/authorize")
-				.clientId("client-id")
+				.clientId(MOCK_CLIENT_ID)
 				.additionalParameters(additionalParams)
 				.build();
 	}
@@ -59,7 +61,7 @@ public class SmartLaunchContextIdTokenCustomizerTest {
 		when(context.getAuthorization()).thenReturn(authorization);
 		// getRegisteredClientId is only called when a launch ID is resolved
 		if (launchId != null) {
-			when(authorization.getRegisteredClientId()).thenReturn("client-id");
+			when(authorization.getRegisteredClientId()).thenReturn(MOCK_CLIENT_ID);
 		}
 		var additionalParams = launchId != null
 				? Map.of(OAuthUtils.LAUNCH_PARAMETER_NAME, (Object) launchId)
@@ -76,7 +78,7 @@ public class SmartLaunchContextIdTokenCustomizerTest {
 		setupIdTokenContext(launchId);
 		var launchContext = new SmartLaunchContext();
 		launchContext.setFhirUserAttribute(fhirUser);
-		when(service.findByOpaqueIdAndClientId(launchId, "client-id")).thenReturn(Optional.of(launchContext));
+		when(service.findByOpaqueIdAndClientId(launchId, MOCK_CLIENT_ID)).thenReturn(Optional.of(launchContext));
 		when(context.getClaims()).thenReturn(claimsBuilder);
 		when(claimsBuilder.claim(anyString(), any())).thenReturn(claimsBuilder);
 
@@ -90,7 +92,7 @@ public class SmartLaunchContextIdTokenCustomizerTest {
 		var launchId = "abc123";
 		setupIdTokenContext(launchId);
 		var launchContext = new SmartLaunchContext();
-		when(service.findByOpaqueIdAndClientId(launchId, "client-id")).thenReturn(Optional.of(launchContext));
+		when(service.findByOpaqueIdAndClientId(launchId, MOCK_CLIENT_ID)).thenReturn(Optional.of(launchContext));
 
 		customizer().customize(context);
 
@@ -101,7 +103,7 @@ public class SmartLaunchContextIdTokenCustomizerTest {
 	public void testCustomizeDoesNotAddClaimWhenLaunchContextNotFound() {
 		var launchId = "abc123";
 		setupIdTokenContext(launchId);
-		when(service.findByOpaqueIdAndClientId(launchId, "client-id")).thenReturn(Optional.empty());
+		when(service.findByOpaqueIdAndClientId(launchId, MOCK_CLIENT_ID)).thenReturn(Optional.empty());
 
 		customizer().customize(context);
 

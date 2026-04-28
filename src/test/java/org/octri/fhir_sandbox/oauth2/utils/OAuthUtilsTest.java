@@ -24,7 +24,7 @@ public class OAuthUtilsTest {
 	private OAuth2AuthorizationRequest buildAuthRequest(Map<String, Object> additionalParams) {
 		return OAuth2AuthorizationRequest.authorizationCode()
 				.authorizationUri("https://example.com/oauth2/authorize")
-				.clientId("client-id")
+				.clientId("mock-client-id")
 				.additionalParameters(additionalParams)
 				.build();
 	}

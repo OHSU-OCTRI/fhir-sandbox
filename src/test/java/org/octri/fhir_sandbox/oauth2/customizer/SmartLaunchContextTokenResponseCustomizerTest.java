@@ -33,6 +33,11 @@ import org.springframework.security.oauth2.server.authorization.authentication.O
 @ExtendWith(MockitoExtension.class)
 public class SmartLaunchContextTokenResponseCustomizerTest {
 
+	private static final String MOCK_CLIENT_ID = "mock-client-id";
+	private static final String MOCK_ACCESS_TOKEN = "token-value";
+	private static final String MOCK_ID_TOKEN = "some-id-token";
+	private static final String MOCK_PATIENT_ID = "Patient/123";
+
 	@Mock
 	private OAuth2AuthorizationService oauth2AuthorizationService;
 
@@ -68,16 +73,16 @@ public class SmartLaunchContextTokenResponseCustomizerTest {
 	private void setupValidContext(String launchId) {
 		when(context.getAuthentication()).thenReturn(authenticationToken);
 		when(authenticationToken.getAccessToken()).thenReturn(accessToken);
-		when(accessToken.getTokenValue()).thenReturn("token-value");
-		when(oauth2AuthorizationService.findByToken("token-value", OAuth2TokenType.ACCESS_TOKEN))
+		when(accessToken.getTokenValue()).thenReturn(MOCK_ACCESS_TOKEN);
+		when(oauth2AuthorizationService.findByToken(MOCK_ACCESS_TOKEN, OAuth2TokenType.ACCESS_TOKEN))
 				.thenReturn(authorization);
-		when(authorization.getRegisteredClientId()).thenReturn("client-id");
+		when(authorization.getRegisteredClientId()).thenReturn(MOCK_CLIENT_ID);
 		var additionalParams = launchId != null
 				? Map.of(OAuthUtils.LAUNCH_PARAMETER_NAME, (Object) launchId)
 				: Map.<String, Object> of();
 		var authRequest = OAuth2AuthorizationRequest.authorizationCode()
 				.authorizationUri("https://example.com/oauth2/authorize")
-				.clientId("client-id")
+				.clientId(MOCK_CLIENT_ID)
 				.additionalParameters(additionalParams)
 				.build();
 		when(authorization.getAttributes()).thenReturn(
@@ -89,11 +94,11 @@ public class SmartLaunchContextTokenResponseCustomizerTest {
 	public void testAcceptMergesLaunchContextAttributesWhenLaunchContextFound() {
 		var launchId = "launch-1";
 		setupValidContext(launchId);
-		var tokenParams = Map.of("id_token", (Object) "some-id-token");
+		var tokenParams = Map.of("id_token", (Object) MOCK_ID_TOKEN);
 		when(authenticationToken.getAdditionalParameters()).thenReturn(tokenParams);
 		var launchContext = new SmartLaunchContext();
-		launchContext.setPatientAttribute("Patient/123");
-		when(smartLaunchContextService.findByOpaqueIdAndClientId(launchId, "client-id"))
+		launchContext.setPatientAttribute(MOCK_PATIENT_ID);
+		when(smartLaunchContextService.findByOpaqueIdAndClientId(launchId, MOCK_CLIENT_ID))
 				.thenReturn(Optional.of(launchContext));
 		when(context.getAccessTokenResponse()).thenReturn(responseBuilder);
 		when(responseBuilder.additionalParameters(any())).thenReturn(responseBuilder);
@@ -103,9 +108,9 @@ public class SmartLaunchContextTokenResponseCustomizerTest {
 		var captor = ArgumentCaptor.forClass(Map.class);
 		verify(responseBuilder).additionalParameters(captor.capture());
 		var merged = captor.getValue();
-		assertEquals("some-id-token", merged.get("id_token"),
+		assertEquals(MOCK_ID_TOKEN, merged.get("id_token"),
 				"token response additional parameters are preserved in the merged map");
-		assertEquals("Patient/123", merged.get(SmartLaunchContext.PATIENT_ATTRIBUTE),
+		assertEquals(MOCK_PATIENT_ID, merged.get(SmartLaunchContext.PATIENT_ATTRIBUTE),
 				"launch context attributes are added to the merged map");
 	}
 
@@ -131,8 +136,8 @@ public class SmartLaunchContextTokenResponseCustomizerTest {
 	public void testAcceptThrowsExceptionWhenAuthorizationNotFound() {
 		when(context.getAuthentication()).thenReturn(authenticationToken);
 		when(authenticationToken.getAccessToken()).thenReturn(accessToken);
-		when(accessToken.getTokenValue()).thenReturn("token-value");
-		when(oauth2AuthorizationService.findByToken("token-value", OAuth2TokenType.ACCESS_TOKEN)).thenReturn(null);
+		when(accessToken.getTokenValue()).thenReturn(MOCK_ACCESS_TOKEN);
+		when(oauth2AuthorizationService.findByToken(MOCK_ACCESS_TOKEN, OAuth2TokenType.ACCESS_TOKEN)).thenReturn(null);
 
 		assertThrows(IllegalArgumentException.class, () -> customizer.accept(context),
 				"accept throws IllegalArgumentException when no authorization is found for the access token");
@@ -143,7 +148,7 @@ public class SmartLaunchContextTokenResponseCustomizerTest {
 		var launchId = "missing-launch";
 		setupValidContext(launchId);
 		when(authenticationToken.getAdditionalParameters()).thenReturn(Map.of());
-		when(smartLaunchContextService.findByOpaqueIdAndClientId(launchId, "client-id"))
+		when(smartLaunchContextService.findByOpaqueIdAndClientId(launchId, MOCK_CLIENT_ID))
 				.thenReturn(Optional.empty());
 
 		assertThrows(IllegalArgumentException.class, () -> customizer.accept(context),
