@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add initial OpenID Connect support (RFS-275)
 - Add initial SMART launch context support (RFS-278)
 - Add JavaScript to construct a launch context when launching an app (RFS-278)
+- Add `fhirUser` to OpenID Connect ID token if present in launch context (RFS-278)
 
 ### Changed
 
