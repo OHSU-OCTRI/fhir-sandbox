@@ -14,7 +14,6 @@ import org.octri.fhir_sandbox.domain.Sandbox;
 import org.octri.fhir_sandbox.domain.SmartClient;
 import org.octri.fhir_sandbox.repository.SandboxRepository;
 import org.octri.fhir_sandbox.repository.SmartClientRepository;
-import org.octri.fhir_sandbox.util.AsyncDataUtil;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -109,6 +108,7 @@ public class SandboxService {
 	public Sandbox createSandbox(Sandbox sandbox) {
 		createPartitionForSandbox(sandbox);
 		Sandbox savedSandbox = repository.save(sandbox);
+		loadSampleData(savedSandbox);
 		return savedSandbox;
 	}
 
@@ -142,7 +142,7 @@ public class SandboxService {
 	 */
 	@Async
 	public void loadSampleData(Sandbox sandbox) {
-		var sampleData = AsyncDataUtil.tryGetFutureOrNull(sampleDataService.getAllSampleBundles(fhirContext));
+		var sampleData = sampleDataService.getAllSampleBundles();
 		var fhirClient = fhirContext.newRestfulGenericClient(getSandboxFhirUrl(sandbox));
 		for (var bundle : sampleData) {
 			Bundle resp = fhirClient
