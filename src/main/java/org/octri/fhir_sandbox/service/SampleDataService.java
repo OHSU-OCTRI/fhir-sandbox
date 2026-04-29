@@ -28,33 +28,33 @@ public class SampleDataService {
 	}
 
 	/**
-	 * Uses configuration to discover sample data, returns them as an array of
-	 * Spring Resource objects.
-	 * 
-	 * Returns an empty array if an exception occurs.
-	 * 
-	 * @return
-	 */
-	private Resource[] getSampleResources() {
-		try {
-			return resourcePatternResolver.getResources(dataConfig.getSampleDiscoveryPattern());
-		} catch (IOException e) {
-			log.error("Error locating sample data with pattern " + dataConfig.getSampleDiscoveryPattern(), e);
-		}
-		return new Resource[0];
-	}
-
-	/**
-	 * Obtains sample data references, transforms them from Spring Resources to 
+	 * Obtains sample data references, transforms them from Spring Resources to
 	 * FHIR Bundle objects, then filters instances that failed to process before
 	 * returning the data
 	 * 
 	 * @return
 	 */
-	public List<Bundle> getAllSampleBundles() {
+	public List<Bundle> getAllSampleBundles() throws IOException {
 		return Stream.of(getSampleResources())
-				.map(resource -> FhirDataUtil.readFhirResource(resource, Bundle.class))
+				.map(resource -> FhirDataUtil.readFhirJson(resource, Bundle.class))
 				.filter(Objects::nonNull)
 				.toList();
+	}
+
+	/**
+	 * Uses configuration to discover sample data, returns them as an array of
+	 * Spring Resource objects.
+	 * 
+	 * Propagates IOException if thrown by ResourcePatternResolver
+	 * 
+	 * @return
+	 */
+	private Resource[] getSampleResources() throws IOException {
+		try {
+			return resourcePatternResolver.getResources(dataConfig.getSampleResourcePattern());
+		} catch (IOException e) {
+			log.error("Error locating sample data with pattern " + dataConfig.getSampleResourcePattern(), e);
+			throw e;
+		}
 	}
 }

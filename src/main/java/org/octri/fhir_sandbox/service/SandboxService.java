@@ -1,8 +1,11 @@
 package org.octri.fhir_sandbox.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeType;
 import org.hl7.fhir.r4.model.IntegerType;
@@ -19,12 +22,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
 
 /**
  * Business logic for working with {@link Sandbox} entities.
  */
 @Service
 public class SandboxService {
+
+	private static final Log log = LogFactory.getLog(SandboxService.class);
 
 	private final SandboxRepository repository;
 	private final SmartClientRepository sandboxClientRepository;
@@ -108,7 +114,12 @@ public class SandboxService {
 	public Sandbox createSandbox(Sandbox sandbox) {
 		createPartitionForSandbox(sandbox);
 		Sandbox savedSandbox = repository.save(sandbox);
-		loadSampleData(savedSandbox);
+		// TODO: relocate call to loadSampleData so that it can be optional
+		try {
+			loadSampleData(savedSandbox);
+		} catch (IOException e) {
+			log.error("Problem encountered reading sample data resources", e);
+		}
 		return savedSandbox;
 	}
 
@@ -141,15 +152,21 @@ public class SandboxService {
 	 * @param sandbox
 	 */
 	@Async
-	public void loadSampleData(Sandbox sandbox) {
+	public void loadSampleData(Sandbox sandbox) throws IOException {
 		var sampleData = sampleDataService.getAllSampleBundles();
 		var fhirClient = fhirContext.newRestfulGenericClient(getSandboxFhirUrl(sandbox));
 		for (var bundle : sampleData) {
-			Bundle resp = fhirClient
-					.transaction()
-					.withBundle(bundle)
-					.execute();
-			// TODO: check and handle errors
+			try {
+				Bundle resp = fhirClient
+						.transaction()
+						.withBundle(bundle)
+						.execute();
+				// TODO: check outcome and handle failures
+			} catch (BaseServerResponseException e) {
+				log.error("Error response to transaction with sandbox server " + getSandboxFhirUrl(sandbox), e);
+			} catch (Error e) {
+				log.error("Error encountered during transaction with sandbox server " + getSandboxFhirUrl(sandbox), e);
+			}
 		}
 	}
 

@@ -25,7 +25,7 @@ public class FhirDataUtil {
 	 * @param parser
 	 * @return
 	 */
-	public static <T extends IBaseResource> T readFhirResource(Resource resource, Class<T> cls) {
+	public static <T extends IBaseResource> T readFhirJson(Resource resource, Class<T> cls) {
 		try {
 			return parser.parseResource(cls, resource.getInputStream());
 		} catch (IOException e) {

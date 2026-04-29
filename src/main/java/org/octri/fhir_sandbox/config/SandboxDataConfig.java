@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "octri.sandbox.data")
 public class SandboxDataConfig {
 
+	// Configure root directory to pull all FHIR JSON samples from
 	private String samplesLocation;
-	private String sampleDiscoveryPattern;
 
 	public String getSamplesLocation() {
 		return samplesLocation;
@@ -18,11 +18,8 @@ public class SandboxDataConfig {
 		this.samplesLocation = samplesLocation;
 	}
 
-	public String getSampleDiscoveryPattern() {
-		return getSamplesLocation() + sampleDiscoveryPattern;
+	public String getSampleResourcePattern() {
+		return samplesLocation + "**.json";
 	}
 
-	public void setSampleDiscoveryPattern(String sampleDiscoveryPattern) {
-		this.sampleDiscoveryPattern = sampleDiscoveryPattern;
-	}
 }
