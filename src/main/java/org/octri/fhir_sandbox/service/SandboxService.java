@@ -1,8 +1,12 @@
 package org.octri.fhir_sandbox.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeType;
 import org.hl7.fhir.r4.model.IntegerType;
 import org.hl7.fhir.r4.model.Parameters;
@@ -13,10 +17,12 @@ import org.octri.fhir_sandbox.domain.Sandbox;
 import org.octri.fhir_sandbox.domain.SmartClient;
 import org.octri.fhir_sandbox.repository.SandboxRepository;
 import org.octri.fhir_sandbox.repository.SmartClientRepository;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
 
 /**
  * Business logic for working with {@link Sandbox} entities.
@@ -24,17 +30,21 @@ import ca.uhn.fhir.context.FhirContext;
 @Service
 public class SandboxService {
 
+	private static final Log log = LogFactory.getLog(SandboxService.class);
+
 	private final SandboxRepository repository;
 	private final SmartClientRepository sandboxClientRepository;
 	private final FhirServerProperties fhirServerProperties;
 	private final FhirContext fhirContext;
+	private final SampleDataService sampleDataService;
 
 	public SandboxService(SandboxRepository repository, SmartClientRepository sandboxClientRepository,
-			FhirServerProperties fhirServerProperties, FhirContext fhirContext) {
+			FhirServerProperties fhirServerProperties, FhirContext fhirContext, SampleDataService sampleDataService) {
 		this.repository = repository;
 		this.sandboxClientRepository = sandboxClientRepository;
 		this.fhirServerProperties = fhirServerProperties;
 		this.fhirContext = fhirContext;
+		this.sampleDataService = sampleDataService;
 	}
 
 	/**
@@ -104,6 +114,12 @@ public class SandboxService {
 	public Sandbox createSandbox(Sandbox sandbox) {
 		createPartitionForSandbox(sandbox);
 		Sandbox savedSandbox = repository.save(sandbox);
+		// TODO: relocate call to loadSampleData so that it can be optional
+		try {
+			loadSampleData(savedSandbox);
+		} catch (IOException e) {
+			log.error("Problem encountered reading sample data resources", e);
+		}
 		return savedSandbox;
 	}
 
@@ -128,6 +144,30 @@ public class SandboxService {
 	public void deleteById(Long id) {
 		var sandbox = repository.findById(id).get();
 		delete(sandbox);
+	}
+
+	/**
+	 * Loads sample FHIR resources then posts them to the FHIR server
+	 * 
+	 * @param sandbox
+	 */
+	@Async
+	public void loadSampleData(Sandbox sandbox) throws IOException {
+		var sampleData = sampleDataService.getAllSampleBundles();
+		var fhirClient = fhirContext.newRestfulGenericClient(getSandboxFhirUrl(sandbox));
+		for (var bundle : sampleData) {
+			try {
+				Bundle resp = fhirClient
+						.transaction()
+						.withBundle(bundle)
+						.execute();
+				// TODO: check outcome and handle failures
+			} catch (BaseServerResponseException e) {
+				log.error("Error response to transaction with sandbox server " + getSandboxFhirUrl(sandbox), e);
+			} catch (Error e) {
+				log.error("Error encountered during transaction with sandbox server " + getSandboxFhirUrl(sandbox), e);
+			}
+		}
 	}
 
 	/**
