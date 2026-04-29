@@ -7,13 +7,22 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "octri.sandbox.data")
 public class SandboxDataConfig {
 
-	private String samplesDirectory;
-	
-	public String getSampleDirectory() {
-		return samplesDirectory;
+	private String samplesLocation;
+	private String sampleDiscoveryPattern;
+
+	public String getSamplesLocation() {
+		return samplesLocation;
 	}
 
-	public void setSampleDirectory(String samplesDirectory) {
-		this.samplesDirectory = samplesDirectory;
+	public void setSamplesLocation(String samplesLocation) {
+		this.samplesLocation = samplesLocation;
+	}
+
+	public String getSampleDiscoveryPattern() {
+		return getSamplesLocation() + sampleDiscoveryPattern;
+	}
+
+	public void setSampleDiscoveryPattern(String sampleDiscoveryPattern) {
+		this.sampleDiscoveryPattern = sampleDiscoveryPattern;
 	}
 }

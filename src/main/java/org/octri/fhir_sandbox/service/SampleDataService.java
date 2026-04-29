@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hl7.fhir.r4.model.Bundle;
 import org.octri.fhir_sandbox.config.SandboxDataConfig;
 import org.octri.fhir_sandbox.util.FhirDataUtil;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
@@ -27,24 +28,33 @@ public class SampleDataService {
 	}
 
 	/**
-	 * Locates FHIR bundle files in the configured samples directory, parses the
-	 * data, then filters data that failed to process before returning the data
+	 * Uses configuration to discover sample data, returns them as an array of
+	 * Spring Resource objects.
 	 * 
-	 * Returns an empty list if there was an error reading the samples directory
+	 * Returns an empty array if an exception occurs.
+	 * 
+	 * @return
+	 */
+	private Resource[] getSampleResources() {
+		try {
+			return resourcePatternResolver.getResources(dataConfig.getSampleDiscoveryPattern());
+		} catch (IOException e) {
+			log.error("Error locating sample data with pattern " + dataConfig.getSampleDiscoveryPattern(), e);
+		}
+		return new Resource[0];
+	}
+
+	/**
+	 * Obtains sample data references, transforms them from Spring Resources to 
+	 * FHIR Bundle objects, then filters instances that failed to process before
+	 * returning the data
 	 * 
 	 * @return
 	 */
 	public List<Bundle> getAllSampleBundles() {
-		try {
-			// Get the sample file resources and parse them into FHIR Bundles
-			var resources = resourcePatternResolver.getResources(dataConfig.getSampleDirectory());
-			return Stream.of(resources)
-					.map(resource -> FhirDataUtil.readFhirResource(resource, Bundle.class))
-					.filter(Objects::nonNull)
-					.toList();
-		} catch (IOException e) {
-			log.error("Error reading data from samples directory (" + dataConfig.getSampleDirectory() + "):", e);
-		}
-		return List.of();
+		return Stream.of(getSampleResources())
+				.map(resource -> FhirDataUtil.readFhirResource(resource, Bundle.class))
+				.filter(Objects::nonNull)
+				.toList();
 	}
 }
