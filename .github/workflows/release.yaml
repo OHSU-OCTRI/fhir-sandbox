@@ -73,7 +73,7 @@ jobs:
         generate_release_notes: false
 
     - name: Update Kubernetes manifests
-      uses: fjogeleit/yaml-update-action@v0.16.1
+      uses: fjogeleit/yaml-update-action@v0.17.0
       with:
         changes: |
           {
