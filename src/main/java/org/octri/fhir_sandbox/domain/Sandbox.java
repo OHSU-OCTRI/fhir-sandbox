@@ -8,6 +8,8 @@ import org.octri.common.view.Labelled;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -23,6 +25,9 @@ public class Sandbox extends AbstractEntity implements Labelled {
 	@Size(max = 200)
 	private String description;
 
+	@Enumerated(value = EnumType.STRING)
+	private SandboxStatus status;
+
 	@NotNull
 	@Column(unique = true)
 	private Long serverPartitionId;
@@ -30,6 +35,10 @@ public class Sandbox extends AbstractEntity implements Labelled {
 	@NotNull
 	@Column(unique = true)
 	private String serverPartitionName = UUID.randomUUID().toString();
+
+	public Boolean getIsReady() {
+		return SandboxStatus.READY.equals(getStatus());
+	}
 
 	public User getOwner() {
 		return owner;
@@ -45,6 +54,14 @@ public class Sandbox extends AbstractEntity implements Labelled {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public SandboxStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(SandboxStatus status) {
+		this.status = status;
 	}
 
 	public Long getServerPartitionId() {
