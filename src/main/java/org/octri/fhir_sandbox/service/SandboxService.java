@@ -3,6 +3,8 @@ package org.octri.fhir_sandbox.service;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -14,6 +16,7 @@ import org.hl7.fhir.r4.model.StringType;
 import org.octri.authentication.server.security.entity.User;
 import org.octri.fhir_sandbox.config.FhirServerProperties;
 import org.octri.fhir_sandbox.domain.Sandbox;
+import org.octri.fhir_sandbox.domain.SandboxStatus;
 import org.octri.fhir_sandbox.domain.SmartClient;
 import org.octri.fhir_sandbox.repository.SandboxRepository;
 import org.octri.fhir_sandbox.repository.SmartClientRepository;
@@ -114,12 +117,6 @@ public class SandboxService {
 	public Sandbox createSandbox(Sandbox sandbox) {
 		createPartitionForSandbox(sandbox);
 		Sandbox savedSandbox = repository.save(sandbox);
-		// TODO: relocate call to loadSampleData so that it can be optional
-		try {
-			loadSampleData(savedSandbox);
-		} catch (IOException e) {
-			log.error("Problem encountered reading sample data resources", e);
-		}
 		return savedSandbox;
 	}
 
@@ -147,13 +144,46 @@ public class SandboxService {
 	}
 
 	/**
+	 * Asynchronously performs setup tasks for sandboxes
+	 * 
+	 * First sets the status to INITIALIZING, then decides whether the load
+	 * sample FHIR resources before setting the status to READY.
+	 * 
+	 * If loadSampleData throws an error, the status is instead updated to ERROR
+	 * 
+	 * @param sandbox
+	 * @param importSampleData
+	 */
+	@Async
+	public void initializeSandbox(Sandbox sandbox, Boolean importSampleData) {
+		sandbox.setStatus(SandboxStatus.INITIALIZING);
+		sandbox = repository.save(sandbox);
+		try {
+			if (importSampleData) {
+				loadSampleData(sandbox).join();
+			}
+			sandbox.setStatus(SandboxStatus.READY);
+		} catch (CompletionException e) {
+			sandbox.setStatus(SandboxStatus.ERROR);
+		}
+		repository.save(sandbox);
+	}
+
+	/**
 	 * Loads sample FHIR resources then posts them to the FHIR server
 	 * 
 	 * @param sandbox
 	 */
 	@Async
-	public void loadSampleData(Sandbox sandbox) throws IOException {
-		var sampleData = sampleDataService.getAllSampleBundles();
+	public CompletableFuture<Void> loadSampleData(Sandbox sandbox) {
+		var future = new CompletableFuture<Void>();
+		List<Bundle> sampleData = List.of();
+		try {
+			sampleData = sampleDataService.getAllSampleBundles();
+		} catch (IOException e) {
+			log.error("Problem encountered reading sample data resources", e);
+			future.completeExceptionally(e);
+		}
 		var fhirClient = fhirContext.newRestfulGenericClient(getSandboxFhirUrl(sandbox));
 		for (var bundle : sampleData) {
 			try {
@@ -164,10 +194,18 @@ public class SandboxService {
 				// TODO: check outcome and handle failures
 			} catch (BaseServerResponseException e) {
 				log.error("Error response to transaction with sandbox server " + getSandboxFhirUrl(sandbox), e);
+				future.completeExceptionally(e);
+				break;
 			} catch (Error e) {
 				log.error("Error encountered during transaction with sandbox server " + getSandboxFhirUrl(sandbox), e);
+				future.completeExceptionally(e);
+				break;
 			}
 		}
+		if (!future.isCompletedExceptionally()) {
+			future.complete(null);
+		}
+		return future;
 	}
 
 	/**

@@ -14,7 +14,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.validation.Valid;
@@ -45,10 +47,13 @@ public class SandboxController extends AbstractEntityController<Sandbox, Sandbox
 		return template;
 	}
 
-	@Override
-	public String create(Map<String, Object> model, @Valid @ModelAttribute("entity") Sandbox entity,
+	@PostMapping(value = "/new", params = "importSampleData")
+	public String create(Map<String, Object> model,
+			@RequestParam(value = "importSampleData", required = false) Boolean importSampleData,
+			@Valid @ModelAttribute("entity") Sandbox entity,
 			BindingResult bindingResult, RedirectAttributes redirectAttributes) {
 		var newEntity = sandboxService.createSandbox(entity);
+		sandboxService.initializeSandbox(newEntity, importSampleData);
 		redirectAttributes.addFlashAttribute("successMessage", this.entityName() + " successfully created.");
 		return showRedirect(newEntity.getId());
 	}

@@ -9,6 +9,19 @@
     <div class="invalid-feedback">{{#i18n}}sandbox.description.validationMessage{{/i18n}}</div>
 </div>
 
+{{^id}}
+<div class="form-group">
+    <label>{{#i18n}}sandbox.initControls.header{{/i18n}}</label>
+    <div>
+        <input class="form-check-input" type="checkbox" name="importSampleData">
+        <label class="form-check-label" for="importSampleData">
+            {{#i18n}}sandbox.initControls.importSampleData.label{{/i18n}}
+        </label>
+        <input type="hidden" name="importSampleData" value="false">
+    </div>
+</div>
+{{/id}}
+
 <input type="hidden" id="server_partition_id" name="serverPartitionId" value="{{#serverPartitionId}}{{.}}{{/serverPartitionId}}" required>
 <input type="hidden" id="server_partition_name" name="serverPartitionName" value="{{#serverPartitionName}}{{.}}{{/serverPartitionName}}" required>
 
