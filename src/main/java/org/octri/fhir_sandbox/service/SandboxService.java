@@ -62,6 +62,18 @@ public class SandboxService {
 	}
 
 	/**
+	 * Finds sandboxes with the specified status (for all owners)
+	 * 
+	 * TODO: Method security to ensure only admins can view all sandboxes.
+	 * 
+	 * @param status
+	 * @return
+	 */
+	public Iterable<Sandbox> findByStatus(SandboxStatus status) {
+		return repository.findByStatus(status);
+	}
+
+	/**
 	 * Finds a sandbox by ID.
 	 *
 	 * @param id
