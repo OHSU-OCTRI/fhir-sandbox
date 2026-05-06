@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add JavaScript to construct a launch context when launching an app (RFS-278)
 - Add `fhirUser` to OpenID Connect ID token if present in launch context (RFS-278)
 - Add autoloading for configurable FHIR data samples (RFS-272)
+- Add audience claim to access tokens to facilitate limiting sandbox access (RFS-250)
 
 ### Changed
 
@@ -40,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Use `SmartClientService` to delete clients in `SmartClientController` to ensure that
   OAuth clients are cleaned up. Fixes a bug where OAuth clients were orphaned on delete.
+- Only add `fhirUser` claim to the OIDC ID token if the `fhirUser` scope was approved. (RFS-287)
 
 [unreleased]: https://github.com/OCTRI-Apps/fhir-sandbox/compare/v0.1.0...HEAD
 [0.1.0]: https://source.ohsu.edu/OCTRI-Apps/fhir-sandbox/releases/tag/v0.1.0

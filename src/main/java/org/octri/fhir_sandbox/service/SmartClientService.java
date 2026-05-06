@@ -55,6 +55,18 @@ public class SmartClientService implements RegisteredClientRepository {
 	}
 
 	/**
+	 * Finds a client by the registered client ID.
+	 *
+	 * NOTE: Not to be confused with {@link #findByClientId(String)}, which returns a {@link RegisteredClient}.
+	 *
+	 * @param id
+	 * @return
+	 */
+	public Optional<SmartClient> findSmartClientByClientId(String id) {
+		return repository.findByClientId(id);
+	}
+
+	/**
 	 * Saves a SmartClient.
 	 *
 	 * @param client

@@ -3,8 +3,10 @@ package org.octri.fhir_sandbox.config;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
-import org.octri.fhir_sandbox.oauth2.customizer.SmartLaunchContextIdTokenCustomizer;
 import org.octri.fhir_sandbox.oauth2.customizer.SmartLaunchContextTokenResponseCustomizer;
+import org.octri.fhir_sandbox.oauth2.customizer.SmartOnFhirAwareTokenCustomizer;
+import org.octri.fhir_sandbox.service.SandboxService;
+import org.octri.fhir_sandbox.service.SmartClientService;
 import org.octri.fhir_sandbox.service.SmartLaunchContextService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,8 +99,9 @@ public class OAuth2ServerConfig {
 	 */
 	@Bean
 	public OAuth2TokenCustomizer<JwtEncodingContext> idTokenCustomizer(
-			SmartLaunchContextService smartLaunchContextService) {
-		return new SmartLaunchContextIdTokenCustomizer(smartLaunchContextService);
+			SmartLaunchContextService smartLaunchContextService, SmartClientService smartClientService,
+			SandboxService sandboxService) {
+		return new SmartOnFhirAwareTokenCustomizer(sandboxService, smartClientService, smartLaunchContextService);
 	}
 
 	/**
