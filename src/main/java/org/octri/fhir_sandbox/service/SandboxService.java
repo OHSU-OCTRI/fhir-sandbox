@@ -176,6 +176,8 @@ public class SandboxService {
 			sandbox = save(sandbox);
 			sampleDataService.loadSampleData(getSandboxFhirUrl(sandbox));
 			sandbox.setStatus(SandboxStatus.READY);
+			save(sandbox);
+			return;
 		} catch (IOException e) {
 			log.error("Problem encountered reading sample data resources", e);
 		} catch (BaseServerResponseException e) {
@@ -183,6 +185,7 @@ public class SandboxService {
 		} catch (Error e) {
 			log.error("Error encountered during transaction with sandbox server " + getSandboxFhirUrl(sandbox), e);
 		}
+		sandbox.setStatus(SandboxStatus.ERROR);
 		save(sandbox);
 	}
 
