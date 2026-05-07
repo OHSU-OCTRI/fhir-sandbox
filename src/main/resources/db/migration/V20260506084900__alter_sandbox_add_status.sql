@@ -5,4 +5,4 @@ ALTER TABLE `sandbox`
 UPDATE `sandbox` SET `status` = 'READY';
 
 ALTER TABLE `sandbox`
-    ADD COLUMN `status` ENUM('CREATED', 'INITIALIZING', 'READY', 'ERROR') NOT NULL;
+    MODIFY COLUMN `status` ENUM('CREATED', 'INITIALIZING', 'READY', 'ERROR') NOT NULL;
