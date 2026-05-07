@@ -69,7 +69,7 @@ public class SandboxService {
 	 * @param status
 	 * @return
 	 */
-	public Iterable<Sandbox> findByStatus(SandboxStatus status) {
+	public <T> List<T> findByStatus(SandboxStatus status) {
 		return repository.findByStatus(status);
 	}
 
@@ -128,6 +128,7 @@ public class SandboxService {
 	 */
 	public Sandbox createSandbox(Sandbox sandbox) {
 		createPartitionForSandbox(sandbox);
+		sandbox.setStatus(SandboxStatus.CREATED);
 		Sandbox savedSandbox = repository.save(sandbox);
 		return savedSandbox;
 	}
@@ -168,17 +169,20 @@ public class SandboxService {
 	 */
 	@Async
 	public void initializeSandbox(Sandbox sandbox, Boolean importSampleData) {
-		sandbox.setStatus(SandboxStatus.INITIALIZING);
-		sandbox = repository.save(sandbox);
+		if (!importSampleData) {
+			sandbox.setStatus(SandboxStatus.READY);
+			sandbox = save(sandbox);
+			return;
+		}
 		try {
-			if (importSampleData) {
-				loadSampleData(sandbox).join();
-			}
+			sandbox.setStatus(SandboxStatus.INITIALIZING);
+			sandbox = save(sandbox);
+			loadSampleData(sandbox).join();
 			sandbox.setStatus(SandboxStatus.READY);
 		} catch (CompletionException e) {
 			sandbox.setStatus(SandboxStatus.ERROR);
 		}
-		repository.save(sandbox);
+		save(sandbox);
 	}
 
 	/**

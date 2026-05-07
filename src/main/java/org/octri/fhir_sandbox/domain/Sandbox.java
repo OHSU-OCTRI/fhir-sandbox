@@ -25,6 +25,7 @@ public class Sandbox extends AbstractEntity implements Labelled {
 	@Size(max = 200)
 	private String description;
 
+	@NotNull
 	@Enumerated(value = EnumType.STRING)
 	private SandboxStatus status;
 
@@ -35,10 +36,6 @@ public class Sandbox extends AbstractEntity implements Labelled {
 	@NotNull
 	@Column(unique = true)
 	private String serverPartitionName = UUID.randomUUID().toString();
-
-	public Boolean getIsReady() {
-		return SandboxStatus.READY.equals(getStatus());
-	}
 
 	public User getOwner() {
 		return owner;
@@ -89,6 +86,10 @@ public class Sandbox extends AbstractEntity implements Labelled {
 	public String toString() {
 		return "Sandbox [id=" + id + ", owner=" + owner + ", description=" + description + ", serverPartitionId="
 				+ serverPartitionId + ", serverPartitionName=" + serverPartitionName + "]";
+	}
+
+	public Boolean isReady() {
+		return SandboxStatus.READY.equals(getStatus());
 	}
 
 }
