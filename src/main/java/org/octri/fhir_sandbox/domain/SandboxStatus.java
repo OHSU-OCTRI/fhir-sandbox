@@ -4,7 +4,7 @@ import org.octri.common.view.Labelled;
 
 public enum SandboxStatus implements Labelled {
 
-	CREATED, INITIALIZING, READY, ERROR;
+	INITIALIZING, READY, ERROR;
 
 	@Override
 	public String getLabel() {

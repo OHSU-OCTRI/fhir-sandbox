@@ -1,6 +1,5 @@
 package org.octri.fhir_sandbox.service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
 
 /**
  * Business logic for working with {@link Sandbox} entities.
@@ -125,7 +123,7 @@ public class SandboxService {
 	 */
 	public Sandbox createSandbox(Sandbox sandbox) {
 		createPartitionForSandbox(sandbox);
-		sandbox.setStatus(SandboxStatus.CREATED);
+		sandbox.setStatus(SandboxStatus.INITIALIZING);
 		Sandbox savedSandbox = repository.save(sandbox);
 		return savedSandbox;
 	}
@@ -166,26 +164,15 @@ public class SandboxService {
 	 */
 	@Async
 	public void initializeSandbox(Sandbox sandbox, Boolean importSampleData) {
-		if (!importSampleData) {
-			sandbox.setStatus(SandboxStatus.READY);
-			sandbox = save(sandbox);
-			return;
-		}
 		try {
-			sandbox.setStatus(SandboxStatus.INITIALIZING);
-			sandbox = save(sandbox);
-			sampleDataService.loadSampleData(getSandboxFhirUrl(sandbox));
+			if (importSampleData) {
+				sampleDataService.loadSampleData(getSandboxFhirUrl(sandbox));
+			}
 			sandbox.setStatus(SandboxStatus.READY);
-			save(sandbox);
-			return;
-		} catch (IOException e) {
-			log.error("Problem encountered reading sample data resources", e);
-		} catch (BaseServerResponseException e) {
-			log.error("Error response to transaction with sandbox server " + getSandboxFhirUrl(sandbox), e);
-		} catch (Error e) {
-			log.error("Error encountered during transaction with sandbox server " + getSandboxFhirUrl(sandbox), e);
+		} catch (Exception e) {
+			log.error("Error encountered loading sample resources", e);
+			sandbox.setStatus(SandboxStatus.ERROR);
 		}
-		sandbox.setStatus(SandboxStatus.ERROR);
 		save(sandbox);
 	}
 
