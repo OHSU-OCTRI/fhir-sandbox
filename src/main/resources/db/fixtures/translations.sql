@@ -3,6 +3,9 @@ INSERT INTO translation (`version`, `created_at`, `updated_at`, `locale`, `messa
 VALUES
 (0, NOW(), NOW(), 'en-US', 'home.heading', 'Your Sandboxes', 'Title for the home page', 0),
 (0, NOW(), NOW(), 'en-US', 'home.noSandboxes', 'No sandboxes found. Click the button above to create your first sandbox.', 'Message to show when the user has no sandboxes', 0),
+(0, NOW(), NOW(), 'en-US', 'sandbox.status.label', 'Status', 'Label for Sandbox status field', 0),
+(0, NOW(), NOW(), 'en-US', 'sandbox.initControls.header', 'Setup Options', 'Header for initialization controls in the Sandbox form', 0),
+(0, NOW(), NOW(), 'en-US', 'sandbox.initControls.importSampleData.label', 'Import sample patients and practitioner', 'Header for the sample data import control in the Sandbox form', 0),
 (0, NOW(), NOW(), 'en-US', 'sandbox.owner.label', 'Owner', 'Label for Sandbox owner field', 0),
 (0, NOW(), NOW(), 'en-US', 'sandbox.clients.label', 'Clients', 'Label for the section showing the clients associated with a sandbox', 0),
 (0, NOW(), NOW(), 'en-US', 'sandbox.clients.none', 'No clients have been registered for this sandbox.', 'Message to show when a sandbox has no clients', 0),

@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -107,12 +108,15 @@ public class HomeController {
 	}
 
 	@PostMapping("/sandboxes/create")
-	public ModelAndView createSandbox(Map<String, Object> model, @Valid @ModelAttribute("entity") Sandbox sandbox,
+	public ModelAndView createSandbox(Map<String, Object> model,
+			@RequestParam(value = "importSampleData", required = false) Boolean importSampleData,
+			@Valid @ModelAttribute("entity") Sandbox sandbox,
 			BindingResult bindingResult, RedirectAttributes redirectAttributes) {
 		var securityHelper = new SecurityHelper(SecurityContextHolder.getContext());
 		var currentUser = userService.findByUsername(securityHelper.username());
 		sandbox.setOwner(currentUser);
 		var savedSandbox = sandboxService.createSandbox(sandbox);
+		sandboxService.initializeSandbox(savedSandbox, importSampleData);
 		model.put("newEntity", savedSandbox);
 		redirectAttributes.addFlashAttribute("successMessage", "Sandbox successfully created.");
 		return new ModelAndView("redirect:/sandboxes/" + savedSandbox.getId());

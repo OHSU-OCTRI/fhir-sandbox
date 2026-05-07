@@ -14,6 +14,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
+import ca.uhn.fhir.context.FhirContext;
+
 @Service
 public class SampleDataService {
 
@@ -21,10 +23,13 @@ public class SampleDataService {
 
 	private final SandboxDataConfig dataConfig;
 	private final ResourcePatternResolver resourcePatternResolver;
+	private final FhirContext fhirContext;
 
-	public SampleDataService(SandboxDataConfig dataConfig, ResourcePatternResolver resourcePatternResolver) {
+	public SampleDataService(SandboxDataConfig dataConfig, ResourcePatternResolver resourcePatternResolver,
+			FhirContext fhirContext) {
 		this.dataConfig = dataConfig;
 		this.resourcePatternResolver = resourcePatternResolver;
+		this.fhirContext = fhirContext;
 	}
 
 	/**
@@ -55,6 +60,24 @@ public class SampleDataService {
 		} catch (IOException e) {
 			log.error("Error locating sample data with pattern " + dataConfig.getSampleResourcePattern(), e);
 			throw e;
+		}
+	}
+
+	/**
+	 * Loads sample FHIR resources then posts them to the FHIR server
+	 * 
+	 * @param fhirUrl
+	 */
+	public void loadSampleData(String fhirUrl) throws IOException {
+		List<Bundle> sampleData = List.of();
+		sampleData = getAllSampleBundles();
+		var fhirClient = fhirContext.newRestfulGenericClient(fhirUrl);
+		for (var bundle : sampleData) {
+			Bundle resp = fhirClient
+					.transaction()
+					.withBundle(bundle)
+					.execute();
+			// TODO: check outcome and handle failures
 		}
 	}
 }

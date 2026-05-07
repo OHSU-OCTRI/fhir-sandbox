@@ -9,6 +9,11 @@
 			{{#owner}}{{label}}{{/owner}}
 			{{^owner}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/owner}}
 		</p>
+        <h5>{{#i18n}}sandbox.status.label{{/i18n}}</h5>
+        <p>
+            {{#status}}{{.}}{{/status}}
+            {{^status}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/status}}
+        </p>
 		<h5>{{#i18n}}sandbox.fhirServerUrl.label{{/i18n}}</h5>
 		<p>
 			{{#fhirServerUrl}}{{.}}{{/fhirServerUrl}}
@@ -18,6 +23,7 @@
 		{{/entity}}
 	</div>
 
+	{{#entity.isReady}}
 	<div class="vertical-space">
 	<h2>{{#i18n}}sandbox.clients.label{{/i18n}}</h2>
 
@@ -54,5 +60,6 @@
 	<p class="text-muted">{{#i18n}}sandbox.clients.none{{/i18n}}</p>
 	{{/hasClients}}
 	</div>
+	{{/entity.isReady}}
 </div>
 {{>layout/footer}}

@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `fhirUser` to OpenID Connect ID token if present in launch context (RFS-278)
 - Add autoloading for configurable FHIR data samples (RFS-272)
 - Add audience claim to access tokens to facilitate limiting sandbox access (RFS-250)
+- Add checkbox to sandbox creation forms, triggering sample data import (RFS-284)
 
 ### Changed
 

@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.octri.common.controller.AbstractEntityController;
 import org.octri.common.view.OptionList;
 import org.octri.fhir_sandbox.domain.ClientType;
+import org.octri.fhir_sandbox.domain.SandboxStatus;
 import org.octri.fhir_sandbox.domain.SmartClient;
 import org.octri.fhir_sandbox.repository.SandboxRepository;
 import org.octri.fhir_sandbox.repository.SmartClientRepository;
@@ -52,7 +53,7 @@ public class SmartClientController extends AbstractEntityController<SmartClient,
 
 		// Add options for select.
 		model.put("sandboxOptions",
-				OptionList.fromSearch(sandboxService.findAll(), null));
+				OptionList.fromSearch(sandboxService.findByStatus(SandboxStatus.READY), null));
 		model.put("clientTypeOptions",
 				OptionList.fromEnum(EnumSet.allOf(ClientType.class), entity.getClientType()));
 		return template;
@@ -75,7 +76,7 @@ public class SmartClientController extends AbstractEntityController<SmartClient,
 
 		// Add options for select.
 		model.put("sandboxOptions",
-				OptionList.fromSearch(sandboxService.findAll(), entity.getSandbox()));
+				OptionList.fromSearch(sandboxService.findByStatus(SandboxStatus.READY), entity.getSandbox()));
 		model.put("clientTypeOptions",
 				OptionList.fromEnum(EnumSet.allOf(ClientType.class), entity.getClientType()));
 
