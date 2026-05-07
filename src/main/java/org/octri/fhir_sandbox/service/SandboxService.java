@@ -65,7 +65,7 @@ public class SandboxService {
 	 * @param status
 	 * @return
 	 */
-	public <T> List<T> findByStatus(SandboxStatus status) {
+	public List<Sandbox> findByStatus(SandboxStatus status) {
 		return repository.findByStatus(status);
 	}
 
