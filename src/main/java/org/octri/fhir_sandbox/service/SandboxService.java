@@ -1,14 +1,11 @@
 package org.octri.fhir_sandbox.service;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.CodeType;
 import org.hl7.fhir.r4.model.IntegerType;
 import org.hl7.fhir.r4.model.Parameters;
@@ -25,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
 
 /**
  * Business logic for working with {@link Sandbox} entities.
@@ -177,51 +173,12 @@ public class SandboxService {
 		try {
 			sandbox.setStatus(SandboxStatus.INITIALIZING);
 			sandbox = save(sandbox);
-			loadSampleData(sandbox).join();
+			sampleDataService.loadSampleData(sandbox, getSandboxFhirUrl(sandbox)).join();
 			sandbox.setStatus(SandboxStatus.READY);
 		} catch (CompletionException e) {
 			sandbox.setStatus(SandboxStatus.ERROR);
 		}
 		save(sandbox);
-	}
-
-	/**
-	 * Loads sample FHIR resources then posts them to the FHIR server
-	 * 
-	 * @param sandbox
-	 */
-	@Async
-	public CompletableFuture<Void> loadSampleData(Sandbox sandbox) {
-		var future = new CompletableFuture<Void>();
-		List<Bundle> sampleData = List.of();
-		try {
-			sampleData = sampleDataService.getAllSampleBundles();
-		} catch (IOException e) {
-			log.error("Problem encountered reading sample data resources", e);
-			future.completeExceptionally(e);
-		}
-		var fhirClient = fhirContext.newRestfulGenericClient(getSandboxFhirUrl(sandbox));
-		for (var bundle : sampleData) {
-			try {
-				Bundle resp = fhirClient
-						.transaction()
-						.withBundle(bundle)
-						.execute();
-				// TODO: check outcome and handle failures
-			} catch (BaseServerResponseException e) {
-				log.error("Error response to transaction with sandbox server " + getSandboxFhirUrl(sandbox), e);
-				future.completeExceptionally(e);
-				break;
-			} catch (Error e) {
-				log.error("Error encountered during transaction with sandbox server " + getSandboxFhirUrl(sandbox), e);
-				future.completeExceptionally(e);
-				break;
-			}
-		}
-		if (!future.isCompletedExceptionally()) {
-			future.complete(null);
-		}
-		return future;
 	}
 
 	/**
