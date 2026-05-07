@@ -3,22 +3,18 @@ package org.octri.fhir_sandbox.service;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hl7.fhir.r4.model.Bundle;
 import org.octri.fhir_sandbox.config.SandboxDataConfig;
-import org.octri.fhir_sandbox.domain.Sandbox;
 import org.octri.fhir_sandbox.util.FhirDataUtil;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
 
 @Service
 public class SampleDataService {
@@ -70,39 +66,18 @@ public class SampleDataService {
 	/**
 	 * Loads sample FHIR resources then posts them to the FHIR server
 	 * 
-	 * @param sandbox
+	 * @param fhirUrl
 	 */
-	@Async
-	public CompletableFuture<Void> loadSampleData(Sandbox sandbox, String fhirUrl) {
-		var future = new CompletableFuture<Void>();
+	public void loadSampleData(String fhirUrl) throws IOException {
 		List<Bundle> sampleData = List.of();
-		try {
-			sampleData = getAllSampleBundles();
-		} catch (IOException e) {
-			log.error("Problem encountered reading sample data resources", e);
-			future.completeExceptionally(e);
-		}
+		sampleData = getAllSampleBundles();
 		var fhirClient = fhirContext.newRestfulGenericClient(fhirUrl);
 		for (var bundle : sampleData) {
-			try {
-				Bundle resp = fhirClient
-						.transaction()
-						.withBundle(bundle)
-						.execute();
-				// TODO: check outcome and handle failures
-			} catch (BaseServerResponseException e) {
-				log.error("Error response to transaction with sandbox server " + fhirUrl, e);
-				future.completeExceptionally(e);
-				break;
-			} catch (Error e) {
-				log.error("Error encountered during transaction with sandbox server " + fhirUrl, e);
-				future.completeExceptionally(e);
-				break;
-			}
+			Bundle resp = fhirClient
+					.transaction()
+					.withBundle(bundle)
+					.execute();
+			// TODO: check outcome and handle failures
 		}
-		if (!future.isCompletedExceptionally()) {
-			future.complete(null);
-		}
-		return future;
 	}
 }

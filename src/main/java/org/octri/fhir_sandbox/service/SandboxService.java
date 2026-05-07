@@ -1,8 +1,8 @@
 package org.octri.fhir_sandbox.service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.CompletionException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
 
 /**
  * Business logic for working with {@link Sandbox} entities.
@@ -173,10 +174,14 @@ public class SandboxService {
 		try {
 			sandbox.setStatus(SandboxStatus.INITIALIZING);
 			sandbox = save(sandbox);
-			sampleDataService.loadSampleData(sandbox, getSandboxFhirUrl(sandbox)).join();
+			sampleDataService.loadSampleData(getSandboxFhirUrl(sandbox));
 			sandbox.setStatus(SandboxStatus.READY);
-		} catch (CompletionException e) {
-			sandbox.setStatus(SandboxStatus.ERROR);
+		} catch (IOException e) {
+			log.error("Problem encountered reading sample data resources", e);
+		} catch (BaseServerResponseException e) {
+			log.error("Error response to transaction with sandbox server " + getSandboxFhirUrl(sandbox), e);
+		} catch (Error e) {
+			log.error("Error encountered during transaction with sandbox server " + getSandboxFhirUrl(sandbox), e);
 		}
 		save(sandbox);
 	}
