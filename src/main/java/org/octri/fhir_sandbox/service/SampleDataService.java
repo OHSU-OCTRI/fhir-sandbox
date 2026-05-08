@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hl7.fhir.r4.model.Bundle;
+import org.octri.fhir_sandbox.config.FhirServerProperties;
 import org.octri.fhir_sandbox.config.SandboxDataConfig;
 import org.octri.fhir_sandbox.util.FhirDataUtil;
 import org.springframework.core.io.Resource;
@@ -23,13 +24,17 @@ public class SampleDataService {
 
 	private final SandboxDataConfig dataConfig;
 	private final ResourcePatternResolver resourcePatternResolver;
+	private final FhirServerProperties fhirServerProperties;
 	private final FhirContext fhirContext;
 
 	public SampleDataService(SandboxDataConfig dataConfig, ResourcePatternResolver resourcePatternResolver,
-			FhirContext fhirContext) {
+			FhirServerProperties fhirServerProperties, FhirContext fhirContext) {
 		this.dataConfig = dataConfig;
 		this.resourcePatternResolver = resourcePatternResolver;
+		this.fhirServerProperties = fhirServerProperties;
 		this.fhirContext = fhirContext;
+
+		fhirContext.getRestfulClientFactory().setSocketTimeout(this.fhirServerProperties.getSocketTimeout());
 	}
 
 	/**
