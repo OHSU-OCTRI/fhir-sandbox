@@ -6,6 +6,7 @@ import org.octri.authentication.server.security.repository.UserRepository;
 import org.octri.common.controller.AbstractEntityController;
 import org.octri.common.view.OptionList;
 import org.octri.fhir_sandbox.domain.Sandbox;
+import org.octri.fhir_sandbox.domain.SandboxStatus;
 import org.octri.fhir_sandbox.repository.SandboxRepository;
 import org.octri.fhir_sandbox.service.SandboxService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,16 @@ public class SandboxController extends AbstractEntityController<Sandbox, Sandbox
 		sandboxService.initializeSandbox(newEntity, importSampleData);
 		redirectAttributes.addFlashAttribute("successMessage", this.entityName() + " successfully created.");
 		return showRedirect(newEntity.getId());
+	}
+
+	@Override
+	public String show(Map<String, Object> model, @PathVariable Long id) {
+		String template = super.show(model, id);
+
+		Sandbox entity = (Sandbox) model.get("entity");
+
+		model.put("preventDelete", entity.getStatus().equals(SandboxStatus.INITIALIZING));
+		return template;
 	}
 
 	@Override

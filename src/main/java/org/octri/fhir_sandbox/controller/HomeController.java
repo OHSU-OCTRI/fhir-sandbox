@@ -11,6 +11,7 @@ import org.octri.common.view.OptionList;
 import org.octri.common.view.ViewUtils;
 import org.octri.fhir_sandbox.domain.ClientType;
 import org.octri.fhir_sandbox.domain.Sandbox;
+import org.octri.fhir_sandbox.domain.SandboxStatus;
 import org.octri.fhir_sandbox.domain.SmartClient;
 import org.octri.fhir_sandbox.domain.SmartLaunchContextProperties;
 import org.octri.fhir_sandbox.service.SandboxService;
@@ -136,6 +137,7 @@ public class HomeController {
 		// TODO: RFS-249 remove stub IDs
 		model.put("stubPatientId", stubPatientId);
 		model.put("stubPractitionerId", stubPractitionerId);
+		model.put("preventDelete", sandbox.getStatus().equals(SandboxStatus.INITIALIZING));
 
 		return new ModelAndView("home/sandbox_details", model);
 	}
