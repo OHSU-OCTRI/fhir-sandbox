@@ -11,7 +11,7 @@
 
 	<name>fhir-sandbox</name>
 	<description>OCTRI FHIR Sandbox</description>
-	<url>https://source.ohsu.edu/OCTRI-Apps/fhir-sandbox</url>
+	<url>https://github.com/OHSU-OCTRI/fhir-sandbox</url>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -38,16 +38,16 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:https://source.ohsu.edu/OCTRI-Apps/fhir-sandbox.git</connection>
-		<developerConnection>scm:git:https://source.ohsu.edu/OCTRI-Apps/fhir-sandbox.git</developerConnection>
-		<url>https://source.ohsu.edu/OCTRI-Apps/fhir-sandbox/tree/main</url>
+		<connection>scm:git:https://github.com/OHSU-OCTRI/fhir-sandbox.git</connection>
+		<developerConnection>scm:git:https://github.com/OHSU-OCTRI/fhir-sandbox.git</developerConnection>
+		<url>https://github.com/OHSU-OCTRI/fhir-sandbox/tree/main</url>
 	</scm>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>17</java.version>
-		<node.version>v24.14.0</node.version>
+		<node.version>v24.15.0</node.version>
 		<authlib.version>4.0.0</authlib.version>
 		<commonlib.version>2.0.0</commonlib.version>
 		<caffeine.version>3.1.8</caffeine.version>
