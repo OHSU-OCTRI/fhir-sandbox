@@ -11,6 +11,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import ca.uhn.fhir.context.FhirContext;
 
+/**
+ * Service for managing partitions in the backend FHIR server
+ */
 @Service
 public class PartitionService {
 
