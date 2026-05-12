@@ -38,6 +38,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Merged `SmartClient` and `Client` entities to resolve update anomalies (RFS-277)
 - Increased the maximum size of SMART client scopes (RFS-271)
 - Enabled asynchronous processing (RFS-272)
+- Run `npm audit fix`
+- Upgrade GitHub Actions dependencies
+- Extracted partition methods from SandboxService into new PartitionService (RFS-291)
 - Prevent users from deleting Sandboxes with the INITIALIZING status (RFS-284)
 
 ### Fixed
@@ -45,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use `SmartClientService` to delete clients in `SmartClientController` to ensure that
   OAuth clients are cleaned up. Fixes a bug where OAuth clients were orphaned on delete.
 - Only add `fhirUser` claim to the OIDC ID token if the `fhirUser` scope was approved. (RFS-287)
+- Corrected repository URLs in pom.xml
 
 [unreleased]: https://github.com/OCTRI-Apps/fhir-sandbox/compare/v0.1.0...HEAD
 [0.1.0]: https://source.ohsu.edu/OCTRI-Apps/fhir-sandbox/releases/tag/v0.1.0
