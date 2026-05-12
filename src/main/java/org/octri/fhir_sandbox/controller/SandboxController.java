@@ -64,7 +64,7 @@ public class SandboxController extends AbstractEntityController<Sandbox, Sandbox
 
 		Sandbox entity = (Sandbox) model.get("entity");
 
-		model.put("blockDelete", sandboxService.isDeleteBlocked(entity));
+		model.put("preventDelete", !entity.getStatus().isDeletable());
 		return template;
 	}
 

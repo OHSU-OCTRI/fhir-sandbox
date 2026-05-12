@@ -142,16 +142,6 @@ public class SandboxService {
 	}
 
 	/**
-	 * Indicates whether the state of a sandbox permits deletion.
-	 * 
-	 * @param sandbox
-	 * @return
-	 */
-	public Boolean isDeleteBlocked(Sandbox sandbox) {
-		return !sandbox.getStatus().isDeletable();
-	}
-
-	/**
 	 * Asynchronously performs setup tasks for sandboxes
 	 * 
 	 * First sets the status to INITIALIZING, then decides whether the load
