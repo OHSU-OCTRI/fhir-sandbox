@@ -88,8 +88,4 @@ public class Sandbox extends AbstractEntity implements Labelled {
 				+ serverPartitionId + ", serverPartitionName=" + serverPartitionName + "]";
 	}
 
-	public Boolean isReady() {
-		return SandboxStatus.READY.equals(getStatus());
-	}
-
 }

@@ -23,7 +23,7 @@
 		{{/entity}}
 	</div>
 
-	{{#entity.isReady}}
+	{{#entity.status.isReady}}
 	<div class="vertical-space">
 	<h2>{{#i18n}}sandbox.clients.label{{/i18n}}</h2>
 
@@ -60,6 +60,6 @@
 	<p class="text-muted">{{#i18n}}sandbox.clients.none{{/i18n}}</p>
 	{{/hasClients}}
 	</div>
-	{{/entity.isReady}}
+	{{/entity.status.isReady}}
 </div>
 {{>layout/footer}}
