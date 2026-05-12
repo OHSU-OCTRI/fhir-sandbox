@@ -136,7 +136,7 @@ public class HomeController {
 		// TODO: RFS-249 remove stub IDs
 		model.put("stubPatientId", stubPatientId);
 		model.put("stubPractitionerId", stubPractitionerId);
-
+		model.put("blockDelete", sandboxService.isDeleteBlocked(sandbox));
 		return new ModelAndView("home/sandbox_details", model);
 	}
 

@@ -61,6 +61,10 @@ public class SandboxController extends AbstractEntityController<Sandbox, Sandbox
 	@Override
 	public String show(Map<String, Object> model, @PathVariable Long id) {
 		String template = super.show(model, id);
+
+		Sandbox entity = (Sandbox) model.get("entity");
+
+		model.put("blockDelete", sandboxService.isDeleteBlocked(entity));
 		return template;
 	}
 
