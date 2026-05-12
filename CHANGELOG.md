@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add autoloading for configurable FHIR data samples (RFS-272)
 - Add audience claim to access tokens to facilitate limiting sandbox access (RFS-250)
 - Add checkbox to sandbox creation forms, triggering sample data import (RFS-284)
+- Configurable property to override default socket timeout of FHIR client (RFS-284)
 
 ### Changed
 
@@ -40,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Run `npm audit fix`
 - Upgrade GitHub Actions dependencies
 - Extracted partition methods from SandboxService into new PartitionService (RFS-291)
+- Prevent users from deleting Sandboxes with the INITIALIZING status (RFS-284)
 
 ### Fixed
 

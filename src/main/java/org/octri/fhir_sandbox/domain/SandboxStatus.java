@@ -10,4 +10,12 @@ public enum SandboxStatus implements Labelled {
 	public String getLabel() {
 		return name();
 	}
+
+	public Boolean isReady() {
+		return SandboxStatus.READY.equals(this);
+	}
+
+	public Boolean isDeletable() {
+		return !SandboxStatus.INITIALIZING.equals(this);
+	}
 }
