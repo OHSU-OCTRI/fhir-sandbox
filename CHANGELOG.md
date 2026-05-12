@@ -39,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enabled asynchronous processing (RFS-272)
 - Run `npm audit fix`
 - Upgrade GitHub Actions dependencies
+- Extracted partition methods from SandboxService into new PartitionService (RFS-291)
 
 ### Fixed
 

@@ -5,12 +5,7 @@ import java.util.Optional;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hl7.fhir.r4.model.CodeType;
-import org.hl7.fhir.r4.model.IntegerType;
-import org.hl7.fhir.r4.model.Parameters;
-import org.hl7.fhir.r4.model.StringType;
 import org.octri.authentication.server.security.entity.User;
-import org.octri.fhir_sandbox.config.FhirServerProperties;
 import org.octri.fhir_sandbox.domain.Sandbox;
 import org.octri.fhir_sandbox.domain.SandboxStatus;
 import org.octri.fhir_sandbox.domain.SmartClient;
@@ -18,9 +13,6 @@ import org.octri.fhir_sandbox.repository.SandboxRepository;
 import org.octri.fhir_sandbox.repository.SmartClientRepository;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import ca.uhn.fhir.context.FhirContext;
 
 /**
  * Business logic for working with {@link Sandbox} entities.
@@ -32,16 +24,14 @@ public class SandboxService {
 
 	private final SandboxRepository repository;
 	private final SmartClientRepository sandboxClientRepository;
-	private final FhirServerProperties fhirServerProperties;
-	private final FhirContext fhirContext;
+	private final PartitionService partitionService;
 	private final SampleDataService sampleDataService;
 
 	public SandboxService(SandboxRepository repository, SmartClientRepository sandboxClientRepository,
-			FhirServerProperties fhirServerProperties, FhirContext fhirContext, SampleDataService sampleDataService) {
+			PartitionService partitionService, SampleDataService sampleDataService) {
 		this.repository = repository;
 		this.sandboxClientRepository = sandboxClientRepository;
-		this.fhirServerProperties = fhirServerProperties;
-		this.fhirContext = fhirContext;
+		this.partitionService = partitionService;
 		this.sampleDataService = sampleDataService;
 	}
 
@@ -122,7 +112,7 @@ public class SandboxService {
 	 * @return
 	 */
 	public Sandbox createSandbox(Sandbox sandbox) {
-		createPartitionForSandbox(sandbox);
+		partitionService.createPartitionForSandbox(sandbox);
 		sandbox.setStatus(SandboxStatus.INITIALIZING);
 		Sandbox savedSandbox = repository.save(sandbox);
 		return savedSandbox;
@@ -137,7 +127,7 @@ public class SandboxService {
 	 * @param sandbox
 	 */
 	public void delete(Sandbox sandbox) {
-		deletePartitionForSandbox(sandbox);
+		partitionService.deletePartitionForSandbox(sandbox);
 		repository.delete(sandbox);
 	}
 
@@ -177,48 +167,6 @@ public class SandboxService {
 	}
 
 	/**
-	 * Creates a new partition on the FHIR server for the given sandbox.
-	 *
-	 * @param sandbox
-	 */
-	private void createPartitionForSandbox(Sandbox sandbox) {
-		var fhirClient = fhirContext.newRestfulGenericClient(getDefaultPartitionUrl());
-		var parameters = new Parameters();
-
-		// TODO: use constants for parameter names
-		parameters.addParameter("name", new CodeType(sandbox.getServerPartitionName()));
-		parameters.addParameter("description", new StringType(sandbox.getDescription()));
-
-		// TODO: use constants for operation name
-		var response = fhirClient
-				.operation()
-				.onServer()
-				.named("$partition-management-create-partition")
-				.withParameters(parameters).execute();
-
-		// TODO: check for and handle errors
-		IntegerType partitionId = (IntegerType) response.getParameter("id").getValue();
-		sandbox.setServerPartitionId(partitionId.getValue().longValue());
-	}
-
-	/**
-	 * Deletes the partition on the FHIR server for the given sandbox.
-	 *
-	 * @param sandbox
-	 */
-	private void deletePartitionForSandbox(Sandbox sandbox) {
-		var fhirClient = fhirContext.newRestfulGenericClient(getDefaultPartitionUrl());
-		var parameters = new Parameters();
-		parameters.addParameter().setName("id").setValue(new IntegerType(sandbox.getServerPartitionId()));
-		var response = fhirClient
-				.operation()
-				.onServer()
-				.named("$partition-management-delete-partition")
-				.withParameters(parameters).execute();
-		// TODO: check and handle errors
-	}
-
-	/**
 	 * Constructs the FHIR server URL for the given sandbox, which is based on the base URL from the application
 	 * properties and the partition name from the sandbox metadata.
 	 *
@@ -226,30 +174,7 @@ public class SandboxService {
 	 * @return
 	 */
 	public String getSandboxFhirUrl(Sandbox sandbox) {
-		return getSandboxFhirUrl(sandbox.getServerPartitionName());
-	}
-
-	/**
-	 * Constructs the FHIR server URL for the default partition, which is based on the base URL from the application
-	 * properties and the default partition name from the application properties.
-	 *
-	 * @return
-	 */
-	public String getDefaultPartitionUrl() {
-		return getSandboxFhirUrl(fhirServerProperties.getDefaultPartition());
-	}
-
-	/**
-	 * Constructs the FHIR server URL for the given partition name, which is based on the base URL from the application
-	 * properties and the given partition name.
-	 *
-	 * @param partitionName
-	 * @return
-	 */
-	private String getSandboxFhirUrl(String partitionName) {
-		var uriBuilder = UriComponentsBuilder.fromUriString(fhirServerProperties.getBaseUrl());
-		uriBuilder.pathSegment(partitionName).path("/");
-		return uriBuilder.build().toUriString();
+		return partitionService.getPartitionFhirUrl(sandbox.getServerPartitionName());
 	}
 
 }

@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 
 import ca.uhn.fhir.context.FhirContext;
 
+/**
+ * Service for loading sample data and saving them to a remove FHIR server
+ */
 @Service
 public class SampleDataService {
 
