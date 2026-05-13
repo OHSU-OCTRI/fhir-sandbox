@@ -15,9 +15,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AccessTokenAuthenticationContext;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.util.Assert;
@@ -54,6 +57,17 @@ public class OAuth2ServerConfig {
 	}
 
 	/**
+	 * Provides a JWT encoder that can be used to sign JWTs with the authorization server's RSA key.
+	 *
+	 * @param jwkSource
+	 * @return
+	 */
+	@Bean
+	public JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource) {
+		return new NimbusJwtEncoder(jwkSource);
+	}
+
+	/**
 	 * Provides a JWT decoder that can be used to decode and validate JWTs issued by the authorization server.
 	 *
 	 * @param jwkSource
@@ -72,6 +86,18 @@ public class OAuth2ServerConfig {
 	@Bean
 	public OAuth2AuthorizationServerConfiguration authorizationServerConfiguration() {
 		return new OAuth2AuthorizationServerConfiguration();
+	}
+
+	/**
+	 * Provides custom authorization server settings with an explicit token issuer value.
+	 *
+	 * @return
+	 */
+	@Bean
+	public AuthorizationServerSettings authorizationServerSettings() {
+		return AuthorizationServerSettings.builder()
+				.issuer(oauth2Properties.getIssuerUrl())
+				.build();
 	}
 
 	/**

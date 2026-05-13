@@ -9,7 +9,26 @@ import org.springframework.core.io.Resource;
 @ConfigurationProperties(prefix = "octri.sandbox.oauth2")
 public class OAuth2ServerProperties {
 
+	private String issuerUrl;
 	private Resource privateKeyLocation;
+
+	/**
+	 * Gets the URL to use in the JWT issuer <code>iss</code> claim.
+	 *
+	 * @return
+	 */
+	public String getIssuerUrl() {
+		return issuerUrl;
+	}
+
+	/**
+	 * Sets the URL to use in the JWT issuer <code>iss</code> claim.
+	 *
+	 * @param issuerUrl
+	 */
+	public void setIssuerUrl(String issuerUrl) {
+		this.issuerUrl = issuerUrl;
+	}
 
 	/**
 	 * Gets the location of the RSA private key used to sign JWTs.
@@ -22,7 +41,7 @@ public class OAuth2ServerProperties {
 
 	/**
 	 * Sets the location of the RSA private key used to sign JWTs.
-	 * 
+	 *
 	 * @param privateKeyLocation
 	 */
 	public void setPrivateKeyLocation(Resource privateKeyLocation) {
