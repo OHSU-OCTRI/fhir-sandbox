@@ -43,6 +43,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgrade GitHub Actions dependencies
 - Extracted partition methods from SandboxService into new PartitionService (RFS-291)
 - Prevent users from deleting Sandboxes with the INITIALIZING status (RFS-284)
+- Replace Webpack asset pipeline with Vite (RFS-249)
+- Upgrade to ESLint 10 (RFS-249)
 
 ### Fixed
 
