@@ -1,6 +1,7 @@
 package org.octri.fhir_sandbox.util;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,22 +18,24 @@ public class FhirDataUtil {
 	private static final IParser parser = FhirContext.forR4().newJsonParser();
 
 	/**
-	 * Uses the parser and specified cls to read the target file
+	 * Parses the provided {@link Resource} as the specified {@link IBaseResource} class.
 	 * 
 	 * @param <T>
-	 * @param file
+	 * @param resource
 	 * @param cls
-	 * @param parser
 	 * @return
+	 * @throws UncheckedIOException
+	 * @throws DataFormatException
 	 */
 	public static <T extends IBaseResource> T readFhirJson(Resource resource, Class<T> cls) {
 		try {
 			return parser.parseResource(cls, resource.getInputStream());
 		} catch (IOException e) {
 			log.error("Failed to read FHIR resource " + resource.getFilename(), e);
+			throw new UncheckedIOException(e);
 		} catch (DataFormatException e) {
 			log.error("Invalid format in FHIR resource " + resource.getFilename(), e);
+			throw e;
 		}
-		return null;
 	}
 }

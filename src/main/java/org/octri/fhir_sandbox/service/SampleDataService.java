@@ -1,24 +1,25 @@
 package org.octri.fhir_sandbox.service;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Stream;
+import java.io.UncheckedIOException;
+import java.util.Arrays;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Resource;
 import org.octri.fhir_sandbox.config.FhirServerProperties;
 import org.octri.fhir_sandbox.config.SandboxDataConfig;
 import org.octri.fhir_sandbox.util.FhirDataUtil;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Service;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.parser.DataFormatException;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
 
 /**
- * Service for loading sample data and saving them to a remove FHIR server
+ * Service for processing sample data and saving them to a remote FHIR server
  */
 @Service
 public class SampleDataService {
@@ -41,51 +42,53 @@ public class SampleDataService {
 	}
 
 	/**
-	 * Obtains sample data references, transforms them from Spring Resources to
-	 * FHIR Bundle objects, then filters instances that failed to process before
-	 * returning the data
+	 * Uses the provided pattern to resolve {@link Resource} objects, then parses them using the {@link Bundle} model.
 	 * 
+	 * @param resourcePattern
 	 * @return
+	 * @throws UncheckedIOException
+	 * @throws DataFormatException
 	 */
-	public List<Bundle> getAllSampleBundles() throws IOException {
-		return Stream.of(getSampleResources())
-				.map(resource -> FhirDataUtil.readFhirJson(resource, Bundle.class))
-				.filter(Objects::nonNull)
-				.toList();
-	}
-
-	/**
-	 * Uses configuration to discover sample data, returns them as an array of
-	 * Spring Resource objects.
-	 * 
-	 * Propagates IOException if thrown by ResourcePatternResolver
-	 * 
-	 * @return
-	 */
-	private Resource[] getSampleResources() throws IOException {
+	private Bundle[] getSampleBundles(String resourcePattern) {
 		try {
-			return resourcePatternResolver.getResources(dataConfig.getSampleResourcePattern());
+			return Arrays.stream(resourcePatternResolver.getResources(resourcePattern))
+					.map(resource -> FhirDataUtil.readFhirJson(resource, Bundle.class))
+					.toArray(Bundle[]::new);
 		} catch (IOException e) {
-			log.error("Error locating sample data with pattern " + dataConfig.getSampleResourcePattern(), e);
-			throw e;
+			log.error("Error locating sample data using pattern " + resourcePattern, e);
+			throw new UncheckedIOException(e);
 		}
 	}
 
 	/**
-	 * Loads sample FHIR resources then posts them to the FHIR server
+	 * Executes the client transaction to save the {@link Bundle} to the remote server.
+	 * 
+	 * @param bundle
+	 * @param client
+	 */
+	private void handleTransaction(Bundle bundle, IGenericClient client) {
+		Bundle resp = client
+				.transaction()
+				.withBundle(bundle)
+				.execute();
+		// TODO: check outcome; throw exception if data is not saved
+	}
+
+	/**
+	 * Reads configured sample data then posts them to the FHIR server.
+	 * 
+	 * Intentially does not handle errors from helper methods.
 	 * 
 	 * @param fhirUrl
+	 * @throws UncheckedIOException
+	 * @throws DataFormatException
 	 */
-	public void loadSampleData(String fhirUrl) throws IOException {
-		List<Bundle> sampleData = List.of();
-		sampleData = getAllSampleBundles();
+	public void loadSampleData(String fhirUrl) {
 		var fhirClient = fhirContext.newRestfulGenericClient(fhirUrl);
-		for (var bundle : sampleData) {
-			Bundle resp = fhirClient
-					.transaction()
-					.withBundle(bundle)
-					.execute();
-			// TODO: check outcome and handle failures
+		for (var pattern : dataConfig.getSampleResourcePatterns()) {
+			for (var bundle : getSampleBundles(pattern)) {
+				handleTransaction(bundle, fhirClient);
+			}
 		}
 	}
 }

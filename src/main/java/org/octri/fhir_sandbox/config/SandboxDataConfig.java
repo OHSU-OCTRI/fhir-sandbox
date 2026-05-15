@@ -1,5 +1,8 @@
 package org.octri.fhir_sandbox.config;
 
+import java.nio.file.Path;
+import java.util.List;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
@@ -7,19 +10,20 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "octri.sandbox.data")
 public class SandboxDataConfig {
 
-	// Configure root directory to pull all FHIR JSON samples from
-	private String samplesLocation;
+	private List<String> sampleDirectories;
 
-	public String getSamplesLocation() {
-		return samplesLocation;
+	public List<String> getSampleDirectories() {
+		return sampleDirectories;
 	}
 
-	public void setSamplesLocation(String samplesLocation) {
-		this.samplesLocation = samplesLocation;
+	public void setSampleDirectories(List<String> sampleDirectories) {
+		this.sampleDirectories = sampleDirectories;
 	}
 
-	public String getSampleResourcePattern() {
-		return samplesLocation + "**.json";
+	public List<String> getSampleResourcePatterns() {
+		return sampleDirectories.stream()
+				.map(dir -> Path.of(dir, "**.json").toString())
+				.toList();
 	}
 
 }

@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -53,7 +54,7 @@ public class SandboxServiceTest {
 	}
 
 	@Test
-	public void testInitializeSandboxNoSample() throws IOException {
+	public void testInitializeSandboxNoSample() {
 		service.initializeSandbox(spySandbox, false);
 
 		verify(sampleDataService, never()).loadSampleData(any());
@@ -62,7 +63,7 @@ public class SandboxServiceTest {
 	}
 
 	@Test
-	public void testInitializeSandboxSampleSuccessful() throws IOException {
+	public void testInitializeSandboxSampleSuccessful() {
 		service.initializeSandbox(spySandbox, true);
 
 		verify(sampleDataService).loadSampleData(any());
@@ -71,8 +72,8 @@ public class SandboxServiceTest {
 	}
 
 	@Test
-	public void testInitializeSandboxSampleFailure() throws IOException {
-		doThrow(new IOException()).when(sampleDataService).loadSampleData(any());
+	public void testInitializeSandboxSampleFailure() {
+		doThrow(new UncheckedIOException(new IOException())).when(sampleDataService).loadSampleData(any());
 		service.initializeSandbox(spySandbox, true);
 
 		verify(sampleDataService).loadSampleData(any());
@@ -81,7 +82,7 @@ public class SandboxServiceTest {
 	}
 
 	@Test
-	public void testInitializeSandboxStatusTiming() throws IOException {
+	public void testInitializeSandboxStatusTiming() {
 		InOrder order = inOrder(sampleDataService, spySandbox);
 		service.initializeSandbox(spySandbox, true);
 
