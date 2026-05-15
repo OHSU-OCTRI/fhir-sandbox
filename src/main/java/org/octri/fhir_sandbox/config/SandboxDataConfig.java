@@ -22,7 +22,7 @@ public class SandboxDataConfig {
 
 	public List<String> getSampleResourcePatterns() {
 		return sampleDirectories.stream()
-				.map(dir -> Path.of(dir, "**.json").toString())
+				.map(dir -> Path.of(dir, "*.json").toString())
 				.toList();
 	}
 
