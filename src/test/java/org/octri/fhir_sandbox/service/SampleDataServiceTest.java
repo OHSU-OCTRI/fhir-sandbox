@@ -85,7 +85,7 @@ public class SampleDataServiceTest {
 	}
 
 	@Test
-	public void testExceptionReadingDependecyData() throws IOException {
+	public void testExceptionResolvingDependecyData() throws IOException {
 		doThrow(new IOException()).when(resourcePatternResolver).getResources(ancillaryDataPattern);
 		assertThrows(UncheckedIOException.class, () -> {
 			sampleDataService.loadSampleData(fhirUrl);
