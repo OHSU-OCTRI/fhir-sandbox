@@ -45,6 +45,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Prevent users from deleting Sandboxes with the INITIALIZING status (RFS-284)
 - Replace Webpack asset pipeline with Vite (RFS-249)
 - Upgrade to ESLint 10 (RFS-249)
+- Update sample data to Synthea data set (RFS-290)
+- Enable configuration of multiple sample data directories (RFS-290)
+- Updated sample data processing to fail if any files cannot be read (RFS-290)
 
 ### Fixed
 

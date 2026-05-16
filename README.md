@@ -2,8 +2,8 @@
 
 ## Development Info
 
-* [Wiki](https://octri.ohsu.edu/wiki/display/ENTER_CONFLUENCE_KEY/ENTER_PAGE_NAME)
-* [Issues](https://octri.ohsu.edu/issues/projects/ENTER_JIRA_KEY/issues/)
+- [Wiki](https://octri.ohsu.edu/wiki/display/ENTER_CONFLUENCE_KEY/ENTER_PAGE_NAME)
+- [Issues](https://octri.ohsu.edu/issues/projects/ENTER_JIRA_KEY/issues/)
 
 This is a [Spring Boot](https://projects.spring.io/spring-boot/) project. It uses a mysql database for storage, managed using Flyway.
 
@@ -54,3 +54,23 @@ mkdir src/main/resources/db/migration/0.0.1
 ```
 
 Now add your migrations in this directory. For example, `V19700101000042__my_first_migration.sql` which follows the format: `V`, followed by the year, month, day, hours, minutes, seconds (YYYYMMDDhhmmss), two underscores, a short description, and finally `.sql`.
+
+## Sample Data
+
+When creating a new Sandbox, you will be given the option to automatically import sample data. The application provides a default sample data set, but also allows you to configure any number of external directories of sample data.
+
+### Importing Data and Sandbox Status
+
+Importing sample data will cause your Sandbox to stall in the `INITIALIZING` state until the import is complete. During this time, you will not be able to install SMART on FHIR clients or delete the Sandbox. If an error is encountered during data import, the Sandbox will enter the `ERROR` state - and can be deleted. Otherwise, the Sandbox will become `READY` when the import competes.
+
+### Configuring Sample Data
+
+The `octri.sandbox.data.sample-directories` property can be configured in [`src/main/resources/application.properties`](src/main/resources/application.properties) to specify a comma-separated list of resource directories. Those directories will be processed sequentially, allowing you to facilitate data dependencies by placing referenced data toward the front of the list.
+
+Each directory is processed as follows:
+
+1. The directory will be scanned for JSON files (not recursively)
+2. JSON files from that directory will be parsed as FHIR Bundle Resources
+3. Each Bundle will be executed as a transaction with the HAPI FHIR client
+
+If an error is encountered at any point during that process, the entire import will be aborted and the Sandbox's status will be updated to `ERROR`.
