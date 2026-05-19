@@ -22,8 +22,6 @@
     <div class="invalid-feedback">{{#i18n}}smartClient.clientType.validationMessage{{/i18n}}</div>
 </div>
 
-<input type="hidden" id="client_id" name="clientId" value="{{#clientId}}{{.}}{{/clientId}}">
-
 <div class="form-group">
     <label for="name" class="form-label required-field">{{#i18n}}smartClient.name.label{{/i18n}}</label>
     <input type="text" class="form-control" id="name" name="name" value="{{#name}}{{.}}{{/name}}" required>
@@ -33,6 +31,12 @@
 <div class="form-group">
     <label for="description" class="form-label">{{#i18n}}smartClient.description.label{{/i18n}}</label>
     <textarea id="description" class="form-control" name="description" >{{#description}}{{.}}{{/description}}</textarea>
+</div>
+
+<div class="form-group">
+    <label for="client_id" class="form-label required-field">{{#i18n}}smartClient.clientId.label{{/i18n}}</label>
+    <input type="text" id="client_id" class="form-control" name="clientId" value="{{#clientId}}{{.}}{{/clientId}}" maxlength="255" required>
+    <div class="invalid-feedback">{{#i18n}}smartClient.clientId.validationMessage{{/i18n}}</div>
 </div>
 
 <div class="form-group">

@@ -2,7 +2,6 @@
 {{#entity}}
 
 <input type="hidden" id="sandbox" name="sandbox" value="{{#sandbox}}{{id}}{{/sandbox}}">
-<input type="hidden" id="client_id" name="clientId" value="{{#clientId}}{{.}}{{/clientId}}">
 
 <div class="form-group">
     <label for="client_type" class="form-label required-field">{{#i18n}}smartClient.clientType.label{{/i18n}}</label>
@@ -24,6 +23,12 @@
 <div class="form-group">
     <label for="description" class="form-label">{{#i18n}}smartClient.description.label{{/i18n}}</label>
     <textarea id="description" class="form-control" name="description" rows="4" maxlength="1000">{{#description}}{{.}}{{/description}}</textarea>
+</div>
+
+<div class="form-group">
+    <label for="client_id" class="form-label required-field">{{#i18n}}smartClient.clientId.label{{/i18n}}</label>
+    <input type="text" id="client_id" class="form-control" name="clientId" value="{{#clientId}}{{.}}{{/clientId}}" maxlength="255" required>
+    <div class="invalid-feedback">{{#i18n}}smartClient.clientId.validationMessage{{/i18n}}</div>
 </div>
 
 <div class="form-group">
