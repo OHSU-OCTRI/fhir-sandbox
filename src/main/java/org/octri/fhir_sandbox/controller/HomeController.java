@@ -128,6 +128,7 @@ public class HomeController {
 		var clients = sandboxService.getClientsForSandbox(sandbox);
 
 		ViewUtils.addPageScript(model, "launch-client.js");
+		ViewUtils.addPageScript(model, "copy-to-clipboard.js");
 		model.put("baseRoute", BASE_ROUTE);
 		model.put("entity", sandbox);
 		model.put("fhirServerUrl", sandboxService.getSandboxFhirUrl(sandbox));
