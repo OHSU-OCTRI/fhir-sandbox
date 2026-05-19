@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.octri.common.controller.AbstractEntityController;
 import org.octri.common.view.OptionList;
+import org.octri.common.view.ViewUtils;
 import org.octri.fhir_sandbox.domain.ClientType;
 import org.octri.fhir_sandbox.domain.SandboxStatus;
 import org.octri.fhir_sandbox.domain.SmartClient;
@@ -105,6 +106,18 @@ public class SmartClientController extends AbstractEntityController<SmartClient,
 		String msg = this.entityName() + " with id " + id + " successfully deleted.";
 		redirectAttributes.addFlashAttribute("infoMessage", msg);
 		return listingRedirect();
+	}
+
+	@Override
+	public String show(Map<String, Object> model, @PathVariable Long id) {
+		ViewUtils.addPageScript(model, "copy-to-clipboard.js");
+		return super.show(model, id);
+	}
+
+	@Override
+	public String list(Map<String, Object> model) {
+		ViewUtils.addPageScript(model, "copy-to-clipboard.js");
+		return super.list(model);
 	}
 
 	@Override
