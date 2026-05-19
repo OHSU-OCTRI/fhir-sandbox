@@ -49,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update sample data to Synthea data set (RFS-290)
 - Enable configuration of multiple sample data directories (RFS-290)
 - Updated sample data processing to fail if any files cannot be read (RFS-290)
+- Enable user to specify client ID, and remove unique constraint (RFS-258)
 
 ### Fixed
 
