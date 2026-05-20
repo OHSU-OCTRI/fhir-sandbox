@@ -43,7 +43,7 @@
 			{{#clients}}
 			<tr>
 				<td>{{name}}</td>
-				<td>{{clientId}}</td>
+				<td>{{#clientId}}{{.}}{{>components/copy_field}}{{/clientId}}</td>
 				<td>{{launchUri}}</td>
 				<td>
 					{{! TODO: RFS-249 remove stub IDs }}

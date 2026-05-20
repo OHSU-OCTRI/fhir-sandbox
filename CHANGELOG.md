@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add checkbox to sandbox creation forms, triggering sample data import (RFS-284)
 - Configurable property to override default socket timeout of FHIR client (RFS-284)
 - Add a service to generate access tokens without going through the OAuth flow. (RFS-249)
+- Add ability to easily copy client ID (RFS-258)
 
 ### Changed
 
