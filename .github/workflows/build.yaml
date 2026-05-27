@@ -45,3 +45,28 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+
+  run-node-tests:
+    name: Run Node.js tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: npm
+
+      - name: Install packages
+        run: npm install
+
+      # Warn if TypeScript type checks are failing
+      - name: Run type checks
+        run: npm run test:types || echo "::warning ::Type checks failed with exit code $?"
+
+      - name: Run tests
+        run: npm run test:ci

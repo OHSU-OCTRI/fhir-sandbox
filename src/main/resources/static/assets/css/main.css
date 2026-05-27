@@ -77,7 +77,38 @@ div.parent-summary strong {
 	font-size: 1.2rem;
 }
 
-/** Bootstrap 5 **/
+/* Bootstrap compatibility classes */
 .form-group {
 	margin-bottom: 1rem;
+}
+
+/* App launcher modal */
+.launcher-modal-content {
+	height: calc(100vh - 6em);
+	max-height: 600px;
+}
+
+#launcher-modal-body {
+	overflow: hidden;
+}
+
+.launcher-panel {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+}
+
+.launcher-panel-body {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+	gap: 0.5rem;
+}
+
+.launcher-panel-table-wrapper {
+	overflow-y: auto;
+	flex: 1;
+	min-height: 0;
 }

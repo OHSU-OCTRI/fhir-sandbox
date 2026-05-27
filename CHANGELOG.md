@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [Unreleased]
 
 ### Added
 
@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configurable property to override default socket timeout of FHIR client (RFS-284)
 - Add a service to generate access tokens without going through the OAuth flow. (RFS-249)
 - Add ability to easily copy client ID (RFS-258)
+- Add UI for selecting app launch practitioner and patient. (RFS-249)
 
 ### Changed
 
@@ -49,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update sample data to Synthea data set (RFS-290)
 - Enable configuration of multiple sample data directories (RFS-290)
 - Updated sample data processing to fail if any files cannot be read (RFS-290)
+- Use vitest for JavaScript tests. (RFS-249)
 
 ### Fixed
 

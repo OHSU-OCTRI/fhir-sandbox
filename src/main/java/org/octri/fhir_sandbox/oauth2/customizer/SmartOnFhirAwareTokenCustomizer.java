@@ -1,6 +1,7 @@
 package org.octri.fhir_sandbox.oauth2.customizer;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import org.octri.fhir_sandbox.domain.SmartLaunchContext;
 import org.octri.fhir_sandbox.oauth2.utils.OAuthUtils;
@@ -14,9 +15,10 @@ import org.springframework.security.oauth2.server.authorization.token.OAuth2Toke
 import org.springframework.util.Assert;
 
 /**
- * Token customizer that adds SMART app information to OAuth tokens. Adds an audience ("aud") claim for the FHIR server
- * to access tokens and adds the SMART app launch context's <code>fhirUser</code> attribute to the OIDC ID token if the
- * corresponding scope was requested.
+ * Token customizer that adds SMART app information to OAuth tokens. Customizes access tokens to add an audience ("aud")
+ * claim set to the FHIR server URL and add a custom <code>launchContext</code> claim if a launch context is associated
+ * with the authorization. Adds the SMART app launch context's <code>fhirUser</code> attribute to the OIDC ID token if
+ * the corresponding scope was requested.
  */
 public class SmartOnFhirAwareTokenCustomizer implements OAuth2TokenCustomizer<JwtEncodingContext> {
 
@@ -34,14 +36,14 @@ public class SmartOnFhirAwareTokenCustomizer implements OAuth2TokenCustomizer<Jw
 	@Override
 	public void customize(JwtEncodingContext context) {
 		var authorization = context.getAuthorization();
+
 		if (OidcParameterNames.ID_TOKEN.equals(context.getTokenType().getValue())) {
 			var launchId = OAuthUtils.getLaunchIdFromAuthorization(authorization);
 			if (launchId == null) {
 				return;
 			}
 
-			var optLaunchContext = contextService.findByOpaqueIdAndClientId(launchId,
-					authorization.getRegisteredClientId());
+			var optLaunchContext = getLaunchContext(launchId, authorization.getRegisteredClientId());
 			if (optLaunchContext.isPresent()) {
 				var launchContext = optLaunchContext.get();
 				var hasFhirUserScope = context.getAuthorizedScopes()
@@ -64,7 +66,22 @@ public class SmartOnFhirAwareTokenCustomizer implements OAuth2TokenCustomizer<Jw
 			var audience = new ArrayList<String>();
 			audience.add(fhirUrl);
 			context.getClaims().audience(audience);
+
+			var launchId = OAuthUtils.getLaunchIdFromAuthorization(authorization);
+			if (launchId != null) {
+				var optLaunchContext = getLaunchContext(launchId, authorization.getRegisteredClientId());
+				if (optLaunchContext.isEmpty()) {
+					return;
+				}
+
+				var launchContext = optLaunchContext.get();
+				context.getClaims().claim("launchContext", launchContext.toMap());
+			}
 		}
+	}
+
+	private Optional<SmartLaunchContext> getLaunchContext(String opaqueId, String registeredClientId) {
+		return contextService.findByOpaqueIdAndClientId(opaqueId, registeredClientId);
 	}
 
 }

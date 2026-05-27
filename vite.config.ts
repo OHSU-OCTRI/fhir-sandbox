@@ -1,3 +1,4 @@
+/// <reference types="vitest/config" />
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import vuetify from 'vite-plugin-vuetify';
@@ -10,6 +11,7 @@ export default defineConfig({
     outDir: 'target/classes/static',
     rollupOptions: {
       input: [
+        'src/main/resources/frontend/launch-modal.ts',
         'src/main/resources/frontend/managed-content.js'
       ],
       output: {
@@ -27,5 +29,9 @@ export default defineConfig({
   define: {
     __VUE_PROD_DEVTOOLS__: true
   },
-  plugins: [vue(), vuetify({ autoImport: true })]
+  plugins: [vue(), vuetify({ autoImport: true })],
+  test: {
+    environment: 'jsdom',
+    exclude: ['node_modules/*', 'target/*']
+  }
 });
