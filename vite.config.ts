@@ -10,7 +10,8 @@ export default defineConfig({
     outDir: 'target/classes/static',
     rollupOptions: {
       input: [
-        'src/main/resources/frontend/managed-content.js'
+        'src/main/resources/frontend/managed-content.js',
+        'src/main/resources/frontend/account-selection.js'
       ],
       output: {
         entryFileNames: 'assets/js/[name]-[hash].js',

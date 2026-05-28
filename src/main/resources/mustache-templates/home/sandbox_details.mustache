@@ -25,6 +25,10 @@
 
 	{{#entity.status.isReady}}
 	<div class="vertical-space">
+	{{>account/authorize_accounts}}
+	</div>
+
+	<div class="vertical-space">
 	<h2>{{#i18n}}sandbox.clients.label{{/i18n}}</h2>
 
 	<p><a href="{{req.contextPath}}{{baseRoute}}/{{entity.id}}/client/new" class="btn btn-primary">{{#i18n}}smartClient.actions.new{{/i18n}}</a></p>
