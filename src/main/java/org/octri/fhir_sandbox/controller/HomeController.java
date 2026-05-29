@@ -127,9 +127,9 @@ public class HomeController {
 		var sandbox = sandboxService.findById(id).get();
 		var clients = sandboxService.getClientsForSandbox(sandbox);
 
-		model.put("pageScripts", new String[] { "vendor.js", "account-selection.js" });
 		ViewUtils.addPageScript(model, "launch-client.js");
 		ViewUtils.addPageScript(model, "copy-to-clipboard.js");
+		ViewUtils.addPageScript(model, "account-selection.js");
 		model.put("baseRoute", BASE_ROUTE);
 		model.put("entity", sandbox);
 		model.put("fhirServerUrl", sandboxService.getSandboxFhirUrl(sandbox));
