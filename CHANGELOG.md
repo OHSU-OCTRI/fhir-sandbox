@@ -51,6 +51,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enable configuration of multiple sample data directories (RFS-290)
 - Updated sample data processing to fail if any files cannot be read (RFS-290)
 - Use vitest for JavaScript tests. (RFS-249)
+- Use shared GitHub Actions workflows. (RFS-256)
+- Add GitHub Actions workflow to build container image. (RFS-256)
 
 ### Fixed
 
