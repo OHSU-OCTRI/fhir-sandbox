@@ -1,5 +1,11 @@
+<form name="updateSharedAccountsForm" class="invisble-form" method="POST" action="{{req.contextPath}}{{updateSharingAction}}" novalidate>
+	{{ >authlib_fragments/forms/csrf_input }}
+	<input id="add_sharing" class="form-control" type="hidden" name="addSharing[]" value="" />
+	<input id="remove_sharing" class="form-control" type="hidden" name="removeSharing[]" value="" />
+</form>
+
 <h2>Sandbox Sharing</h2>
-<div id="shared_accounts_management">
+<div id="shared_accounts_management" data-accounts="{{accountsJson}}">
   <div class="translation-wrapper" data-key="selectedHeader" data-value="Authorized Accounts"></div>
   <div class="translation-wrapper" data-key="availableHeader" data-value="Available Accounts"></div>
   <div class="translation-wrapper" data-key="addSelectionButton" data-value="Grant Access"></div>

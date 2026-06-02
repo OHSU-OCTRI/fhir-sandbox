@@ -9,30 +9,12 @@ import MultiSelectUpdateTool from './components/MultiSelectUpdateTool.vue';
  * <div id="shared_accounts_management" data-entities="..."></div>
  */
 
-const mock_accounts = {
-  selected: [
-    {
-      id: 2,
-      label: 'user2'
-    }
-  ],
-  available: [
-    {
-      id: 1,
-      label: 'user1'
-    },
-    {
-      id: 3,
-      label: 'user3'
-    },
-    {
-      id: 4,
-      label: 'flimflamthemagicman'
-    }
-  ]
-};
+const updateForm = document.querySelector('form[name="updateSharedAccountsForm"]');
+const addSharingField = updateForm.querySelector('#add_sharing');
+const removeSharingField = updateForm.querySelector('#remove_sharing');
 
-// const dataset = document.querySelector('#shared_accounts_management').dataset;
+const dataset = document.querySelector('#shared_accounts_management').dataset;
+const accounts = JSON.parse(dataset.accounts.replaceAll("'", '"'));
 const translations = [
   ...document.querySelectorAll('#shared_accounts_management .translation-wrapper')
 ].reduce((accumulator, current) => {
@@ -41,11 +23,12 @@ const translations = [
 }, {});
 
 const app = createApp(MultiSelectUpdateTool, {
-  entities: mock_accounts,
+  entities: accounts,
   translations: translations,
-  saveSelectionCallback: (added, removed) => {
-    alert(`Added: ${JSON.stringify(added)}`);
-    alert(`Removed: ${JSON.stringify(removed)}`);
+  saveSelectionCallback: (newSelections, removedSelections) => {
+    addSharingField.value = newSelections.map(account => account.id).join(',');
+    removeSharingField.value = removedSelections.map(account => account.id).join(',');
+    updateForm.submit();
   }
 });
 app.mount('#shared_accounts_management');

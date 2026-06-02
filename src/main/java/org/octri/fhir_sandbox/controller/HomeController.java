@@ -2,6 +2,7 @@ package org.octri.fhir_sandbox.controller;
 
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 /**
@@ -124,6 +126,7 @@ public class HomeController {
 
 	@GetMapping("/sandboxes/{id}")
 	public ModelAndView showSandbox(Map<String, Object> model, @PathVariable Long id) {
+		final String MOCK_ACCOUNTS = "{'selected':[{'id':2,'label':'user2'}],'available':[{'id':1,'label':'user1'},{'id':3,'label':'user3'},{'id':4,'label':'flimflamthemagicman'}]}";
 		var sandbox = sandboxService.findById(id).get();
 		var clients = sandboxService.getClientsForSandbox(sandbox);
 
@@ -133,6 +136,9 @@ public class HomeController {
 		model.put("baseRoute", BASE_ROUTE);
 		model.put("entity", sandbox);
 		model.put("fhirServerUrl", sandboxService.getSandboxFhirUrl(sandbox));
+		model.put("accountsJson", MOCK_ACCOUNTS);
+		model.put("updateSharingAction", BASE_ROUTE + "/" + sandbox.getId() + "/update_sharing");
+		model.put("cancelSharingAction", BASE_ROUTE + "/" + sandbox.getId());
 		model.put("clients", clients);
 		model.put("hasClients", !clients.isEmpty());
 		// TODO: RFS-249 remove stub IDs
@@ -140,6 +146,16 @@ public class HomeController {
 		model.put("stubPractitionerId", stubPractitionerId);
 		model.put("preventDelete", !sandbox.getStatus().isDeletable());
 		return new ModelAndView("home/sandbox_details", model);
+	}
+
+	@PostMapping("sandboxes/{id}/update_sharing")
+	public ModelAndView postMethodName(Map<String, Object> model, @PathVariable Long id,
+			@RequestParam(value = "addSharing[]") List<Long> addSharing,
+			@RequestParam(value = "removeSharing[]") List<Long> removeSharing, HttpServletRequest request) {
+		var entity = sandboxService.findById(id).get();
+		// TODO: process POST request
+
+		return new ModelAndView("redirect:/sandboxes/" + entity.getId());
 	}
 
 	@GetMapping("/sandboxes/{id}/edit")

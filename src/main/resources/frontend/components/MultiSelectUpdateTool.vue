@@ -75,7 +75,12 @@
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
             {{ getTranslation('cancelChangesButton') }}
           </button>
-          <button @click="saveChanges" type="button" class="btn btn-primary">
+          <button
+            @click="saveChanges"
+            type="button"
+            class="btn btn-primary"
+            data-be-dismiss="modal"
+          >
             {{ getTranslation('confirmChangesButton') }}
           </button>
         </div>
@@ -111,7 +116,9 @@ const props = defineProps({
     type: Object as () => Record<string, string>
   },
   saveSelectionCallback: {
-    type: Function as PropType<(added: Entity[], removed: Entity[]) => void>,
+    type: Function as PropType<
+      (newSelections: Entity[], removedSelections: Entity[]) => void
+    >,
     required: true
   }
 });
