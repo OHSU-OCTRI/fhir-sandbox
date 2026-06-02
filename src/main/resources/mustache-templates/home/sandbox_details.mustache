@@ -9,11 +9,11 @@
 			{{#owner}}{{label}}{{/owner}}
 			{{^owner}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/owner}}
 		</p>
-        <h5>{{#i18n}}sandbox.status.label{{/i18n}}</h5>
-        <p>
-            {{#status}}{{.}}{{/status}}
-            {{^status}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/status}}
-        </p>
+		<h5>{{#i18n}}sandbox.status.label{{/i18n}}</h5>
+		<p>
+			{{#status}}{{.}}{{/status}}
+			{{^status}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/status}}
+		</p>
 		<h5>{{#i18n}}sandbox.fhirServerUrl.label{{/i18n}}</h5>
 		<p>
 			{{#fhirServerUrl}}{{.}}{{/fhirServerUrl}}
@@ -46,8 +46,7 @@
 				<td>{{#clientId}}{{.}}{{>components/copy_field}}{{/clientId}}</td>
 				<td>{{launchUri}}</td>
 				<td>
-					{{! TODO: RFS-249 remove stub IDs }}
-					<a href="#" role="button" class="client-launch" data-client-id="{{clientId}}" data-patient-id="{{stubPatientId}}" data-fhir-user="{{stubPractitionerId}}" data-launch-url="{{launchUri}}?iss={{fhirServerUrl}}">{{#i18n}}smartClient.actions.launch{{/i18n}}</a>
+					<a href="#" role="button" class="client-launch" data-client-id="{{clientId}}" data-launch-url="{{launchUri}}?iss={{fhirServerUrl}}">{{#i18n}}smartClient.actions.launch{{/i18n}}</a>
 					<a href="{{req.contextPath}}{{baseRoute}}/{{sandbox.id}}/client/{{id}}/edit">{{#i18n}}system.entity.edit{{/i18n}}</a>
 					<a href="{{req.contextPath}}{{baseRoute}}/{{sandbox.id}}/client/{{id}}/delete" class="text-danger" onclick="return confirm('{{#i18n}}smartClient.actions.deleteMessage{{/i18n}}');">{{#i18n}}system.entity.delete{{/i18n}}</a>
 				</td>
@@ -55,11 +54,22 @@
 			{{/clients}}
 		</tbody>
 	</table>
+
+	<div id="launcher-app" data-sandbox-api="{{req.contextPath}}{{baseRoute}}/{{entity.id}}" data-sandbox-id="{{entity.serverPartitionName}}" data-fhir-api="{{fhirServerUrl}}" data-token="{{accessToken}}"></div>
 	{{/hasClients}}
 	{{^hasClients}}
 	<p class="text-muted">{{#i18n}}sandbox.clients.none{{/i18n}}</p>
 	{{/hasClients}}
 	</div>
 	{{/entity.status.isReady}}
+
+	<div class="modal" tabindex="-1">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content launcher-modal-content">
+				<div id="launcher-modal-body" class="modal-body d-flex flex-column gap-3">
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 {{>layout/footer}}
