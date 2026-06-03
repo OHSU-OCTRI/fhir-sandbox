@@ -126,19 +126,20 @@ public class HomeController {
 
 	@GetMapping("/sandboxes/{id}")
 	public ModelAndView showSandbox(Map<String, Object> model, @PathVariable Long id) {
-		final String MOCK_ACCOUNTS = "{'selected':[{'id':2,'label':'user2'}],'available':[{'id':1,'label':'user1'},{'id':3,'label':'user3'},{'id':4,'label':'flimflamthemagicman'}]}";
+		final String MOCK_SELECTED_ACCOUNTS = "[{'id':2,'label':'user2'}]";
+		final String MOCK_AVAILABLE_ACCOUNTS = "[{'id':1,'label':'user1'},{'id':3,'label':'user3'},{'id':4,'label':'flimflamthemagicman'}]";
 		var sandbox = sandboxService.findById(id).get();
 		var clients = sandboxService.getClientsForSandbox(sandbox);
 
 		ViewUtils.addPageScript(model, "launch-client.js");
 		ViewUtils.addPageScript(model, "copy-to-clipboard.js");
-		ViewUtils.addPageScript(model, "account-selection.js");
+		ViewUtils.addPageScript(model, "shared-account-selector.js");
 		model.put("baseRoute", BASE_ROUTE);
 		model.put("entity", sandbox);
 		model.put("fhirServerUrl", sandboxService.getSandboxFhirUrl(sandbox));
-		model.put("accountsJson", MOCK_ACCOUNTS);
+		model.put("selectedAccountsJson", MOCK_SELECTED_ACCOUNTS);
+		model.put("availableAccountsJson", MOCK_AVAILABLE_ACCOUNTS);
 		model.put("updateSharingAction", BASE_ROUTE + "/" + sandbox.getId() + "/update_sharing");
-		model.put("cancelSharingAction", BASE_ROUTE + "/" + sandbox.getId());
 		model.put("clients", clients);
 		model.put("hasClients", !clients.isEmpty());
 		// TODO: RFS-249 remove stub IDs

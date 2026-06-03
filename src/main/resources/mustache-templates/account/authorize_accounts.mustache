@@ -4,15 +4,12 @@
 	<input id="remove_sharing" class="form-control" type="hidden" name="removeSharing[]" value="" />
 </form>
 
-<h2>Sandbox Sharing</h2>
-<div id="shared_accounts_management" data-accounts="{{accountsJson}}">
-  <div class="translation-wrapper" data-key="selectedHeader" data-value="Authorized Accounts"></div>
-  <div class="translation-wrapper" data-key="availableHeader" data-value="Available Accounts"></div>
-  <div class="translation-wrapper" data-key="addSelectionButton" data-value="Grant Access"></div>
-  {{! <div class="translation-wrapper" data-key="submitSelectionButton" data-value="Save Changes"></div> }}
-  <div class="translation-wrapper" data-key="confirmModalHeader" data-value="Confirm Access Changes"></div>
-  <div class="translation-wrapper" data-key="confirmAddedItemsHeader" data-value="Granting access to"></div>
-  <div class="translation-wrapper" data-key="confirmRemovedItemsHeader" data-value="Revoking access from"></div>
-  {{! <div class="translation-wrapper" data-key="cancelChangesButton" data-value=""></div> }}
-  <div class="translation-wrapper" data-key="confirmChangesButton" data-value="Submit"></div>
+<h2>{{#i18n}}sandbox.sharingSelection.detailsSection.header{{/i18n}}</h2>
+<div id="shared_accounts_selector" data-selected="{{selectedAccountsJson}}" data-available="{{availableAccountsJson}}">
+  <div class="translation-wrapper" data-key="selectedHeader" data-value="{{#i18n}}sandbox.sharingSelection.selected.header{{/i18n}}"></div>
+  <div class="translation-wrapper" data-key="availableHeader" data-value="{{#i18n}}sandbox.sharingSelection.available.header{{/i18n}}"></div>
+  <div class="translation-wrapper" data-key="addSelectionButton" data-value="{{#i18n}}sandbox.sharingSelection.selectButton.label{{/i18n}}"></div>
+  <div class="translation-wrapper" data-key="confirmModalHeader" data-value="{{#i18n}}sandbox.sharingSelection.confirmModal.header{{/i18n}}"></div>
+  <div class="translation-wrapper" data-key="confirmAddedItemsHeader" data-value="{{#i18n}}sandbox.sharingSelection.confirmAddedItems.header{{/i18n}}"></div>
+  <div class="translation-wrapper" data-key="confirmRemovedItemsHeader" data-value="{{#i18n}}sandbox.sharingSelection.confirmRemovedItems.header{{/i18n}}"></div>
 </div>

@@ -1,5 +1,6 @@
 <template>
-  <h5>{{ getTranslation('selectedHeader') }}</h5>
+  <!-- Visible Selection Widget -->
+  <h5 v-if="selectedEntities.length > 0">{{ getTranslation('selectedHeader') }}</h5>
   <div class="current-selections">
     <span
       v-for="entity in selectedEntities"
@@ -30,26 +31,26 @@
     <button
       v-if="selectionsUpdated"
       type="button"
-      class="btn btn-primary"
+      class="btn btn-primary ms-2"
       data-bs-toggle="modal"
-      data-bs-target="#exampleModal"
+      data-bs-target="#confirmModal"
     >
       {{ getTranslation('submitSelectionButton') }}
     </button>
   </div>
 
-  <!-- Modal -->
+  <!-- Submission Confirmation Modal -->
   <div
     class="modal fade"
-    id="exampleModal"
+    id="confirmModal"
     tabindex="-1"
-    aria-labelledby="exampleModalLabel"
+    aria-labelledby="confirmModalLabel"
     aria-hidden="true"
   >
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">
+          <h5 class="modal-title" id="confirmModalLabel">
             {{ getTranslation('confirmModalHeader') }}
           </h5>
           <button
@@ -60,11 +61,15 @@
           ></button>
         </div>
         <div class="modal-body">
-          <h5>{{ getTranslation('confirmAddedItemsHeader') }}</h5>
+          <h5 v-if="addedSelections.size > 0">
+            {{ getTranslation('confirmAddedItemsHeader') }}
+          </h5>
           <ul>
             <li v-for="entity in addedSelections" :key="entity.id">{{ entity.label }}</li>
           </ul>
-          <h5>{{ getTranslation('confirmRemovedItemsHeader') }}</h5>
+          <h5 v-if="removedSelections.size > 0">
+            {{ getTranslation('confirmRemovedItemsHeader') }}
+          </h5>
           <ul>
             <li v-for="entity in removedSelections" :key="entity.id">
               {{ entity.label }}
@@ -79,7 +84,7 @@
             @click="saveChanges"
             type="button"
             class="btn btn-primary"
-            data-be-dismiss="modal"
+            data-bs-dismiss="modal"
           >
             {{ getTranslation('confirmChangesButton') }}
           </button>
@@ -93,7 +98,6 @@
 import { ref, computed } from 'vue';
 import type { PropType } from 'vue';
 import type Entity from '../types/Entity';
-import type EntitiesProp from '../types/EntitiesProp';
 
 const FALLBACK_TRANSLATIONS: Record<string, string> = {
   selectedHeader: 'Selected',
@@ -104,18 +108,22 @@ const FALLBACK_TRANSLATIONS: Record<string, string> = {
   confirmAddedItemsHeader: 'Add these selections',
   confirmRemovedItemsHeader: 'Remove these selections',
   cancelChangesButton: 'Cancel',
-  confirmChangesButton: 'Confirm and Submit'
+  confirmChangesButton: 'Confirm'
 } as const;
 
 const props = defineProps({
-  entities: {
-    type: Object as () => EntitiesProp,
+  selected: {
+    type: Object as () => Entity[],
+    required: true
+  },
+  available: {
+    type: Object as () => Entity[],
     required: true
   },
   translations: {
     type: Object as () => Record<string, string>
   },
-  saveSelectionCallback: {
+  submitSelectionCallback: {
     type: Function as PropType<
       (newSelections: Entity[], removedSelections: Entity[]) => void
     >,
@@ -127,20 +135,20 @@ const optionSelect = ref(undefined);
 const addedSelections = ref(new Set<Entity>());
 const removedSelections = ref(new Set<Entity>());
 
-const selectionsUpdated = computed(() => {
-  return addedSelections.value.size !== 0 || removedSelections.value.size !== 0;
-});
-
 const selectedEntities = computed(() => {
-  return [...props.entities.selected, ...addedSelections.value].filter(
+  return [...props.selected, ...addedSelections.value].filter(
     (entity: Entity) => !removedSelections.value.has(entity)
   );
 });
 
 const availableEntities = computed(() => {
-  return [...props.entities.available, ...removedSelections.value].filter(
+  return [...props.available, ...removedSelections.value].filter(
     (entity: Entity) => !addedSelections.value.has(entity)
   );
+});
+
+const selectionsUpdated = computed(() => {
+  return addedSelections.value.size !== 0 || removedSelections.value.size !== 0;
 });
 
 /**
@@ -185,7 +193,7 @@ const deselectEntity = (entity: Entity) => {
  * Invokes the callback method to handle the saved selection changes
  */
 const saveChanges = () => {
-  props.saveSelectionCallback([...addedSelections.value], [...removedSelections.value]);
+  props.submitSelectionCallback([...addedSelections.value], [...removedSelections.value]);
 };
 
 /**
