@@ -153,7 +153,7 @@ public class HomeController {
 	}
 
 	@PostMapping("sandboxes/{id}/update_sharing")
-	public ModelAndView postMethodName(Map<String, Object> model, @PathVariable Long id,
+	public ModelAndView updateSharing(Map<String, Object> model, @PathVariable Long id,
 			@RequestParam(value = "addSharing[]") List<Long> addSharing,
 			@RequestParam(value = "removeSharing[]") List<Long> removeSharing, HttpServletRequest request) {
 		var entity = sandboxService.findById(id).get();
