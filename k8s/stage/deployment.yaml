@@ -55,12 +55,29 @@ spec:
         - secretRef:
             name: ldap-env
         volumeMounts:
+        - name: data-safe-nfs
+          mountPath: /config/sample_data
+          subPath: fhir-sandbox/synthea_data
+          readOnly: true
         - name: mysql-pki
           mountPath: /etc/pki/mysql
           readOnly: true
+        - name: oauth-pki
+          mountPath: /config/oauth
+          radOnly: true
       volumes:
+      - name: data-safe-nfs
+        persistentVolumeClaim:
+          claimName: data-safe-nfs
       - name: mysql-pki
         secret:
           secretName: stage-mysql-truststore
+      - name: oauth-pki
+        secret:
+          secretName: fhir-sandbox-stage
+          defaultMode: 0440
+          items:
+          - key: jwks-private-key.pem
+            path: jwks-private-key.pem
       imagePullSecrets:
       - name: ghcr-registry-cred
