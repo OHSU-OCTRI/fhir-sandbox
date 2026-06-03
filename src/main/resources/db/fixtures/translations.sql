@@ -23,7 +23,7 @@ VALUES
 (0, NOW(), NOW(), 'en-US', 'sandbox.sharingSelection.selectButton.label', 'Grant Access', 'Label for button that adds the selected account to the sharing list', 0),
 (0, NOW(), NOW(), 'en-US', 'sandbox.sharingSelection.confirmModal.header', 'Confirm Access Changes', 'Header for the confirmation modal used to submit selection changes', 0),
 (0, NOW(), NOW(), 'en-US', 'sandbox.sharingSelection.confirmAddedItems.header', 'Granting access to', 'Header in confirmation modal above the list of added accounts', 0),
-(0, NOW(), NOW(), 'en-US', 'sandbox.sharingSelection.confirmRemovedItems.header', 'Revoking access to', 'Header in confirmation modal above the list of added accounts', 0),
+(0, NOW(), NOW(), 'en-US', 'sandbox.sharingSelection.confirmRemovedItems.header', 'Revoking access from', 'Header in confirmation modal above the list of added accounts', 0),
 (0, NOW(), NOW(), 'en-US', 'smartClient.actions.deleteMessage', 'Are you sure you want to delete this client?', 'Confirmation message when deleting a SmartClient', 0),
 (0, NOW(), NOW(), 'en-US', 'smartClient.actions.new', 'New Client', 'Label for the button to create a new SmartClient', 0),
 (0, NOW(), NOW(), 'en-US', 'smartClient.actions.launch', 'Launch', 'Label for the button to launch a SmartClient', 0),
