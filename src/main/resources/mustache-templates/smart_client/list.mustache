@@ -1,0 +1,29 @@
+{{>layout/header}}
+<div class="container">
+    <h1>{{entityName}} {{#i18n}}system.entity.list{{/i18n}}</h1>
+    {{>components/messages}}
+    <a href="{{req.contextPath}}{{baseRoute}}/new" class="new-entity btn btn-success"><i class="fas fa-plus-circle"></i> {{#i18n}}system.entity.new{{/i18n}}</a>
+    <table class="table table-striped table-bordered sorted">
+        <thead>
+        <tr>
+            <th>{{#i18n}}smartClient.sandbox.label{{/i18n}}</th>
+            <th>{{#i18n}}smartClient.clientType.label{{/i18n}}</th>
+            <th>{{#i18n}}smartClient.clientId.label{{/i18n}}</th>
+            <th>{{#i18n}}smartClient.name.label{{/i18n}}</th>
+            <th>{{#i18n}}system.entity.actions{{/i18n}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#entity_list}}
+        <tr>
+            <td>{{#sandbox}}{{label}}{{/sandbox}}</td>
+            <td>{{#clientType}}{{.}}{{/clientType}}</td>
+            <td>{{#clientId}}{{.}}{{>components/copy_field}}{{/clientId}}</td>
+            <td>{{#name}}{{.}}{{/name}}</td>
+            <td>{{>components/list_actions}}</td>
+        </tr>
+        {{/entity_list}}
+        </tbody>
+    </table>
+</div>
+{{>layout/footer}}

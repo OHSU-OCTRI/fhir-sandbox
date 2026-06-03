@@ -2,11 +2,12 @@ package org.octri.fhir_sandbox.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+import java.util.function.Consumer;
+
 import org.octri.authentication.DefaultSecurityConfigurer;
 import org.octri.authentication.config.AuthenticationRouteProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +17,9 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AccessTokenAuthenticationContext;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
+import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2AccessTokenResponseAuthenticationSuccessHandler;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
@@ -33,11 +36,16 @@ public class SecurityConfiguration {
 
 	private static final Logger log = LoggerFactory.getLogger(SecurityConfiguration.class);
 
-	@Autowired
-	private AuthenticationRouteProperties routes;
+	private final AuthenticationRouteProperties routes;
+	private final DefaultSecurityConfigurer securityConfigurer;
+	private final Consumer<OAuth2AccessTokenAuthenticationContext> tokenResponseCustomizer;
 
-	@Autowired
-	private DefaultSecurityConfigurer securityConfigurer;
+	public SecurityConfiguration(AuthenticationRouteProperties routes, DefaultSecurityConfigurer securityConfigurer,
+			Consumer<OAuth2AccessTokenAuthenticationContext> tokenResponseCustomizer) {
+		this.routes = routes;
+		this.securityConfigurer = securityConfigurer;
+		this.tokenResponseCustomizer = tokenResponseCustomizer;
+	}
 
 	/**
 	 * Configure the security filter chain for the OAuth2 authorization server endpoints. Must be ordered before the
@@ -50,12 +58,16 @@ public class SecurityConfiguration {
 	@Bean
 	@Order(1)
 	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
-		OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = OAuth2AuthorizationServerConfigurer
-				.authorizationServer();
+		var authorizationServerConfigurer = OAuth2AuthorizationServerConfigurer.authorizationServer();
+		var tokenResponseHandler = new OAuth2AccessTokenResponseAuthenticationSuccessHandler();
+		tokenResponseHandler.setAccessTokenResponseCustomizer(tokenResponseCustomizer);
 
 		http
 				.securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
-				.with(authorizationServerConfigurer, withDefaults())
+				.with(authorizationServerConfigurer, (authorizationServer) -> authorizationServer
+						.tokenEndpoint(tokenEndpoint -> tokenEndpoint
+								.accessTokenResponseHandler(tokenResponseHandler))
+						.oidc(withDefaults()))
 				.authorizeHttpRequests((authorize) -> authorize
 						.anyRequest().authenticated())
 				.exceptionHandling((exceptions) -> exceptions
@@ -117,8 +129,7 @@ public class SecurityConfiguration {
 		CorsConfiguration config = new CorsConfiguration();
 		config.addAllowedHeader("*");
 		config.addAllowedMethod("*");
-		config.addAllowedOrigin("http://localhost:8086");
-		config.addAllowedOrigin("http://localhost:5173");
+		config.addAllowedOriginPattern("http://localhost:*");
 		config.setAllowCredentials(true);
 		source.registerCorsConfiguration("/**", config);
 		return source;

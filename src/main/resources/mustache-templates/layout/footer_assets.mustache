@@ -10,6 +10,12 @@
     {{! Page-specific scripts can be specified in the view model }}
     <script type="text/javascript" src="{{req.contextPath}}/assets/js/{{.}}"></script>
 {{/pageScripts}}
+{{#pageModules}}
+    <script type="module" src="{{req.contextPath}}/{{.}}"></script>
+{{/pageModules}}
+{{#pageModulePreloads}}
+    <script type="modulepreload" src="{{req.contextPath}}/{{.}}"></script>
+{{/pageModulePreloads}}
 {{#isAdminOrSuper}}
 {{#adminScripts}}
     <script type="text/javascript" src="{{req.contextPath}}/assets/js/{{.}}"></script>

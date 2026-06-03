@@ -2,8 +2,8 @@
 
 ## Development Info
 
-* [Wiki](https://octri.ohsu.edu/wiki/display/ENTER_CONFLUENCE_KEY/ENTER_PAGE_NAME)
-* [Issues](https://octri.ohsu.edu/issues/projects/ENTER_JIRA_KEY/issues/)
+- [Wiki](https://octri.ohsu.edu/wiki/display/ENTER_CONFLUENCE_KEY/ENTER_PAGE_NAME)
+- [Issues](https://octri.ohsu.edu/issues/projects/ENTER_JIRA_KEY/issues/)
 
 This is a [Spring Boot](https://projects.spring.io/spring-boot/) project. It uses a mysql database for storage, managed using Flyway.
 
@@ -13,45 +13,9 @@ This is a [Spring Boot](https://projects.spring.io/spring-boot/) project. It use
 
 When you open the project for the first time with Visual Studio Code, it should offer to install recommended extensions for Java and JavaScript development. To install the extensions manually, open the command palette (CMD-Shift-P), type "recommended", and select the option for "Extensions: Show Recommended Extensions".
 
-### Configuration
+### Running for Local Development
 
-Copy `env.sample` to `.env` and update as needed.
-
-In .env, fill in your LDAP credentials at `YOUR_USERNAME` and `YOUR_PASSWORD`.
-
-LDAP_CONTEXTSOURCE_USERDN=cn=YOUR_USERNAME,ou=User Accounts,dc=ohsum01,dc=ohsu,dc=edu
-LDAP_CONTEXTSOURCE_PASSWORD=YOUR_PASSWORD
-
-## Application Startup
-
-### Running with Docker
-
-Build the project,
-
-```
-mvn clean package
-```
-
-Start the containers, getting mysql up first
-
-```
-docker-compose up -d mysql
-docker-compose up -d app
-```
-
-You should find the app at,
-
-http://localhost:8080/fhir-sandbox
-
-unless you updated `SERVER_SERVLET_CONTEXTPATH`.
-
-### Running with VS Code
-
-There are several ways to run a Spring Boot application using Visual Studio Code. See [Running Spring Boot Applications with VS Code](https://octri.ohsu.edu/wiki/display/TKB/Running+Spring+Boot+Applications+With+VS+Code) for examples.
-
-### Running with Eclipse
-
-See [Running Spring Boot Applications with Eclipse](https://octri.ohsu.edu/wiki/display/ORDS/Running+Spring+Boot+Applications+with+Spring+Tool+Suite) for a complete guide.
+See [RUNNING.md](./RUNNING.md) for instructions on how to configure and run the application for local development.
 
 ## Front End
 
@@ -61,7 +25,41 @@ By default there is a `home.mustache` template that uses a header layout (`layou
 
 Bootstrap 5 and jQuery 3 are both included in the templates. Additional CSS styles may be added to `static/css/main.css`.
 
-Tooling to integrate Vue components is also provided. Scripts to mount Vue applications should be saved to the `src/main/resources/frontend` directory and added to the `entry` block in [`webpack.config.js`](webpack.config.js), while single-file components should be added to `src/main/resources/frontend/components`. To mount a Vue application into a page, add the corresponding entrypoint script to the `pageScripts` array in a controller class. See `webpack.config.js`, `managed-content.js`, and `TranslationController.java` for a full example.
+Tooling to integrate Vue components is also provided. Scripts to mount Vue applications should be saved to the `src/main/resources/frontend` directory and added to the `input` array in [`vite.config.ts`](vite.config.ts).
+
+```typescript
+export default defineConfig({
+  base: '',
+  build: {
+    manifest: true,
+    outDir: 'target/classes/static',
+    rollupOptions: {
+      input: [
+        // NOTE: Add entry scripts to the input array
+        'src/main/resources/frontend/managed-content.js'
+      ],
+      output: {
+        // ...
+      }
+    }
+  },
+  // ...
+});
+```
+
+Components should be added to `src/main/resources/frontend/components`. To mount a Vue application into a page, add the corresponding entrypoint script to the `pageScripts` array in a controller class. See `vite.config.ts`, `managed-content.js`, and `TranslationController.java` for a full example.
+
+## Front End Tests
+
+Front end tests are implemented using [Vitest](https://vitest.dev/). To execute the front end tests, run one of the two provided npm scripts.
+
+```bash
+# To run tests once
+npm run test:ci
+
+# To watch files and run tests repeatedly
+npm test
+```
 
 ## Integration tests requiring a database
 
@@ -90,3 +88,23 @@ mkdir src/main/resources/db/migration/0.0.1
 ```
 
 Now add your migrations in this directory. For example, `V19700101000042__my_first_migration.sql` which follows the format: `V`, followed by the year, month, day, hours, minutes, seconds (YYYYMMDDhhmmss), two underscores, a short description, and finally `.sql`.
+
+## Sample Data
+
+When creating a new Sandbox, you will be given the option to automatically import sample data. The application provides a default sample data set, but also allows you to configure any number of external directories of sample data.
+
+### Importing Data and Sandbox Status
+
+Importing sample data will cause your Sandbox to stall in the `INITIALIZING` state until the import is complete. During this time, you will not be able to install SMART on FHIR clients or delete the Sandbox. If an error is encountered during data import, the Sandbox will enter the `ERROR` state - and can be deleted. Otherwise, the Sandbox will become `READY` when the import competes.
+
+### Configuring Sample Data
+
+The `octri.sandbox.data.sample-directories` property can be configured in [`src/main/resources/application.properties`](src/main/resources/application.properties) to specify a comma-separated list of resource directories. Those directories will be processed sequentially, allowing you to facilitate data dependencies by placing referenced data toward the front of the list.
+
+Each directory is processed as follows:
+
+1. The directory will be scanned for JSON files (not recursively)
+2. JSON files from that directory will be parsed as FHIR Bundle Resources
+3. Each Bundle will be executed as a transaction with the HAPI FHIR client
+
+If an error is encountered at any point during that process, the entire import will be aborted and the Sandbox's status will be updated to `ERROR`.

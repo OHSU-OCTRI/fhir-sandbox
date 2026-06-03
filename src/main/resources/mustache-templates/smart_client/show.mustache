@@ -1,0 +1,71 @@
+{{>layout/header}}
+<div class="container">
+    <h1>{{entityName}}</h1>
+    {{>components/messages}}
+    <div>
+        {{#entity}}
+        <h5>{{#i18n}}smartClient.sandbox.label{{/i18n}}</h5>
+        <p>
+            {{#sandbox}}{{label}}{{/sandbox}}
+            {{^sandbox}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/sandbox}}
+        </p>
+        <h5>{{#i18n}}smartClient.clientType.label{{/i18n}}</h5>
+        <p>
+            {{#clientType}}{{.}}{{/clientType}}
+            {{^clientType}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/clientType}}
+        </p>
+        <h5>{{#i18n}}smartClient.clientId.label{{/i18n}}</h5>
+        <p>
+            {{#clientId}}{{.}}{{>components/copy_field}}{{/clientId}}
+            {{^clientId}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/clientId}}
+        </p>
+        <h5>{{#i18n}}smartClient.name.label{{/i18n}}</h5>
+        <p>
+            {{#name}}{{.}}{{/name}}
+            {{^name}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/name}}
+        </p>
+        <h5>{{#i18n}}smartClient.description.label{{/i18n}}</h5>
+        <p>
+            {{#description}}{{.}}{{/description}}
+            {{^description}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/description}}
+        </p>
+        <h5>{{#i18n}}smartClient.launchUri.label{{/i18n}}</h5>
+        <p>
+            {{#launchUri}}{{.}}{{/launchUri}}
+            {{^launchUri}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/launchUri}}
+        </p>
+        <h5>{{#i18n}}smartClient.redirectUris.label{{/i18n}}</h5>
+        <p>
+            {{#redirectUris}}{{.}}{{/redirectUris}}
+            {{^redirectUris}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/redirectUris}}
+        </p>
+        <h5>{{#i18n}}smartClient.postLogoutRedirectUris.label{{/i18n}}</h5>
+        <p>
+            {{#postLogoutRedirectUris}}{{.}}{{/postLogoutRedirectUris}}
+            {{^postLogoutRedirectUris}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/postLogoutRedirectUris}}
+        </p>
+        <h5>{{#i18n}}smartClient.scopes.label{{/i18n}}</h5>
+        <p>
+            {{#scopes}}{{.}}{{/scopes}}
+            {{^scopes}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/scopes}}
+        </p>
+        <h5>{{#i18n}}smartClient.clientSecretExpiresAt.label{{/i18n}}</h5>
+        <p>
+            {{#clientSecretExpiresAt}}{{.}}{{/clientSecretExpiresAt}}
+            {{^clientSecretExpiresAt}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/clientSecretExpiresAt}}
+        </p>
+        <h5>{{#i18n}}smartClient.clientAuthenticationMethods.label{{/i18n}}</h5>
+        <p>
+            {{#clientAuthenticationMethods}}{{.}}{{/clientAuthenticationMethods}}
+            {{^clientAuthenticationMethods}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/clientAuthenticationMethods}}
+        </p>
+        <h5>{{#i18n}}smartClient.authorizationGrantTypes.label{{/i18n}}</h5>
+        <p>
+            {{#authorizationGrantTypes}}{{.}}{{/authorizationGrantTypes}}
+            {{^authorizationGrantTypes}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/authorizationGrantTypes}}
+        </p>
+        {{>components/show_links}}
+        {{/entity}}
+    </div>
+</div>
+{{>layout/footer}}

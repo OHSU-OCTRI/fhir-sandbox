@@ -1,5 +1,5 @@
 import { createApp } from 'vue';
-import ManagedContentEditor from './components/ManagedContentEditor';
+import ManagedContentEditor from './components/ManagedContentEditor.vue';
 
 /**
  * In the controller add:

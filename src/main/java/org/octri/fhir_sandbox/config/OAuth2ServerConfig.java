@@ -1,13 +1,28 @@
 package org.octri.fhir_sandbox.config;
 
 import java.nio.charset.StandardCharsets;
+import java.util.function.Consumer;
 
+import org.octri.fhir_sandbox.oauth2.customizer.SmartLaunchContextTokenResponseCustomizer;
+import org.octri.fhir_sandbox.oauth2.customizer.SmartOnFhirAwareTokenCustomizer;
+import org.octri.fhir_sandbox.service.SandboxService;
+import org.octri.fhir_sandbox.service.SmartClientService;
+import org.octri.fhir_sandbox.service.SmartLaunchContextService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.server.authorization.OAuth2AuthorizationService;
+import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AccessTokenAuthenticationContext;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
+import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
 import org.springframework.util.Assert;
 
 import com.nimbusds.jose.jwk.JWK;
@@ -22,10 +37,11 @@ import com.nimbusds.jose.proc.SecurityContext;
 @EnableConfigurationProperties(OAuth2ServerProperties.class)
 public class OAuth2ServerConfig {
 
-	private final OAuth2ServerProperties oAuth2Properties;
+	private final Logger log = LoggerFactory.getLogger(getClass());
+	private final OAuth2ServerProperties oauth2Properties;
 
-	public OAuth2ServerConfig(OAuth2ServerProperties oAuth2Properties) {
-		this.oAuth2Properties = oAuth2Properties;
+	public OAuth2ServerConfig(OAuth2ServerProperties oauth2Properties) {
+		this.oauth2Properties = oauth2Properties;
 	}
 
 	/**
@@ -35,9 +51,20 @@ public class OAuth2ServerConfig {
 	 */
 	@Bean
 	public JWKSource<SecurityContext> jwkSource() {
-		JWK privateKey = readPrivateKey(oAuth2Properties.getPrivateKeyLocation());
+		JWK privateKey = readPrivateKey(oauth2Properties.getPrivateKeyLocation());
 		JWKSet jwkSet = new JWKSet(privateKey);
 		return (jwkSelector, securityContext) -> jwkSelector.select(jwkSet);
+	}
+
+	/**
+	 * Provides a JWT encoder that can be used to sign JWTs with the authorization server's RSA key.
+	 *
+	 * @param jwkSource
+	 * @return
+	 */
+	@Bean
+	public JwtEncoder jwtEncoder(JWKSource<SecurityContext> jwkSource) {
+		return new NimbusJwtEncoder(jwkSource);
 	}
 
 	/**
@@ -59,6 +86,48 @@ public class OAuth2ServerConfig {
 	@Bean
 	public OAuth2AuthorizationServerConfiguration authorizationServerConfiguration() {
 		return new OAuth2AuthorizationServerConfiguration();
+	}
+
+	/**
+	 * Provides custom authorization server settings with an explicit token issuer value.
+	 *
+	 * @return
+	 */
+	@Bean
+	public AuthorizationServerSettings authorizationServerSettings() {
+		return AuthorizationServerSettings.builder()
+				.issuer(oauth2Properties.getIssuerUrl())
+				.build();
+	}
+
+	/**
+	 * Provides a customizer that adds SMART app launch context to the OAuth 2.0 token response.
+	 *
+	 * @param oauth2AuthorizationService
+	 *            service used to look up OAuth 2.0 client authorizations
+	 * @param smartLaunchContextService
+	 *            service used to look up SMART app launch context information
+	 * @return
+	 */
+	@Bean
+	public Consumer<OAuth2AccessTokenAuthenticationContext> tokenResponseCustomizer(
+			OAuth2AuthorizationService oauth2AuthorizationService,
+			SmartLaunchContextService smartLaunchContextService) {
+		return new SmartLaunchContextTokenResponseCustomizer(oauth2AuthorizationService, smartLaunchContextService);
+	}
+
+	/**
+	 * Provides a customizer that adds SMART app <code>fhirUser</code> context to the OIDC ID token.
+	 *
+	 * @param smartLaunchContextService
+	 *            service used to look up SMART app launch context information
+	 * @return
+	 */
+	@Bean
+	public OAuth2TokenCustomizer<JwtEncodingContext> idTokenCustomizer(
+			SmartLaunchContextService smartLaunchContextService, SmartClientService smartClientService,
+			SandboxService sandboxService) {
+		return new SmartOnFhirAwareTokenCustomizer(sandboxService, smartClientService, smartLaunchContextService);
 	}
 
 	/**

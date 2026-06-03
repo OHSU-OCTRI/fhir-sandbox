@@ -1,21 +1,34 @@
 {{>components/form_start}}
 {{#entity}}
 <div class="form-group">
-    <label for="owner" class="form-label required-field">Owner</label>
+    <label for="owner" class="form-label required-field">{{#i18n}}sandbox.owner.label{{/i18n}}</label>
     <select class="form-select" id="owner" name="owner" value="{{#owner}}{{.}}{{/owner}}" required>
-        <option value="">-- Please Select --</option>
+        <option value="">-- {{#i18n}}system.entity.select{{/i18n}} --</option>
         {{#ownerOptions}}
         <option value="{{id}}" {{#selected}}selected{{/selected}}>{{label}}</option>
         {{/ownerOptions}}
     </select>
-    <div class="invalid-feedback">Value must be present</div>
+    <div class="invalid-feedback">{{#i18n}}sandbox.owner.validationMessage{{/i18n}}</div>
 </div>
 
 <div class="form-group">
-    <label for="description" class="form-label required-field">Description</label>
-    <input type="text" class="form-control" id="description" name="description" value="{{#description}}{{.}}{{/description}}" required maxlength="200">
-    <div class="invalid-feedback">Value must be present and at most 200 characters</div>
+    <label for="description" class="form-label required-field">{{#i18n}}sandbox.description.label{{/i18n}}</label>
+    <input type="text" class="form-control" id="description" name="description" value="{{#description}}{{.}}{{/description}}" required>
+    <div class="invalid-feedback">{{#i18n}}sandbox.description.validationMessage{{/i18n}}</div>
 </div>
+
+{{^id}}
+<div class="form-group">
+    <label>{{#i18n}}sandbox.initControls.header{{/i18n}}</label>
+    <div>
+        <input class="form-check-input" type="checkbox" name="importSampleData">
+        <label class="form-check-label" for="importSampleData">
+            {{#i18n}}sandbox.initControls.importSampleData.label{{/i18n}}
+        </label>
+        <input type="hidden" name="importSampleData" value="false">
+    </div>
+</div>
+{{/id}}
 
 <input type="hidden" id="server_partition_id" name="serverPartitionId" value="{{#serverPartitionId}}{{.}}{{/serverPartitionId}}" required>
 <input type="hidden" id="server_partition_name" name="serverPartitionName" value="{{#serverPartitionName}}{{.}}{{/serverPartitionName}}" required>

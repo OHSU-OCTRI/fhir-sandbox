@@ -11,12 +11,12 @@
 
 	<name>fhir-sandbox</name>
 	<description>OCTRI FHIR Sandbox</description>
-	<url>https://source.ohsu.edu/OCTRI-Apps/fhir-sandbox</url>
+	<url>https://github.com/OHSU-OCTRI/fhir-sandbox</url>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.11</version>
+		<version>3.5.14</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
@@ -38,23 +38,41 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:https://source.ohsu.edu/OCTRI-Apps/fhir-sandbox.git</connection>
-		<developerConnection>scm:git:https://source.ohsu.edu/OCTRI-Apps/fhir-sandbox.git</developerConnection>
-		<url>https://source.ohsu.edu/OCTRI-Apps/fhir-sandbox/tree/main</url>
+		<connection>scm:git:https://github.com/OHSU-OCTRI/fhir-sandbox.git</connection>
+		<developerConnection>scm:git:https://github.com/OHSU-OCTRI/fhir-sandbox.git</developerConnection>
+		<url>https://github.com/OHSU-OCTRI/fhir-sandbox/tree/main</url>
 	</scm>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>17</java.version>
-		<node.version>v24.14.0</node.version>
-		<authlib.version>3.2.0</authlib.version>
-		<commonlib.version>1.8.0</commonlib.version>
+		<node.version>v24.15.0</node.version>
+		<authlib.version>4.0.0</authlib.version>
+		<commonlib.version>2.0.2-SNAPSHOT</commonlib.version>
 		<caffeine.version>3.1.8</caffeine.version>
 		<!-- Override version for MySQL 8.4 support -->
 		<flyway.version>11.15.0</flyway.version>
-		<hapifhir.version>8.8.0</hapifhir.version>
+		<hapifhir.version>8.8.1</hapifhir.version>
 	</properties>
+
+	<distributionManagement>
+		<repository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/OHSU-OCTRI/fhir-sandbox</url>
+		</repository>
+	</distributionManagement>
+
+	<repositories>
+		<repository>
+			<id>central-snapshots</id>
+			<url>https://central.sonatype.com/repository/maven-snapshots/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 
 	<dependencies>
 		<dependency>
@@ -125,36 +143,6 @@
 			<artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>webjars-locator</artifactId>
-			<version>0.47</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>jquery</artifactId>
-			<version>3.6.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>jquery-ui</artifactId>
-			<version>1.13.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>bootstrap</artifactId>
-			<version>5.3.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>font-awesome</artifactId>
-			<version>6.4.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.webjars</groupId>
-			<artifactId>datatables</artifactId>
-			<version>1.13.4</version>
-		</dependency>
-		<dependency>
 			<groupId>com.github.ben-manes.caffeine</groupId>
 			<artifactId>caffeine</artifactId>
 			<version>${caffeine.version}</version>
@@ -202,6 +190,31 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- TODO: Enable after fixing Javadoc errors -->
+			<!-- <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin> -->
+			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
 				<version>1.15.1</version>
@@ -219,12 +232,12 @@
 						</goals>
 					</execution>
 					<execution>
-						<id>webpack</id>
+						<id>vite</id>
 						<goals>
-							<goal>webpack</goal>
+							<goal>npx</goal>
 						</goals>
 						<configuration>
-							<arguments>${webpack.args}</arguments>
+							<arguments>vite build</arguments>
 						</configuration>
 					</execution>
 				</executions>
@@ -235,4 +248,34 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>ci</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>3.2.8</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<gpgArguments>
+								<arg>--pinentry-mode</arg>
+								<arg>loopback</arg>
+							</gpgArguments>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
