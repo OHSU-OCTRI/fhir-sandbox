@@ -14,12 +14,14 @@ import org.octri.fhir_sandbox.domain.ClientType;
 import org.octri.fhir_sandbox.domain.Sandbox;
 import org.octri.fhir_sandbox.domain.SmartClient;
 import org.octri.fhir_sandbox.domain.SmartLaunchContextProperties;
+import org.octri.fhir_sandbox.service.PreAuthorizedTokenService;
 import org.octri.fhir_sandbox.service.SandboxService;
 import org.octri.fhir_sandbox.service.SmartClientService;
 import org.octri.fhir_sandbox.service.SmartLaunchContextService;
+import org.octri.fhir_sandbox.view.FrontEndSmartApp;
+import org.octri.fhir_sandbox.view.FrontEndSmartAppSandbox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -52,20 +54,15 @@ public class HomeController {
 	private final SandboxService sandboxService;
 	private final SmartClientService clientService;
 	private final SmartLaunchContextService launchContextService;
-
-	// TODO: RFS-249 remove stub IDs
-	@Value("${octri.sandbox.stub-id.patient}")
-	private String stubPatientId;
-
-	@Value("${octri.sandbox.stub-id.practitioner}")
-	private String stubPractitionerId;
+	private final PreAuthorizedTokenService preAuthorizedTokenService;
 
 	public HomeController(UserService userService, SandboxService sandboxService, SmartClientService clientService,
-			SmartLaunchContextService launchContextService) {
+			SmartLaunchContextService launchContextService, PreAuthorizedTokenService preAuthorizedTokenService) {
 		this.userService = userService;
 		this.sandboxService = sandboxService;
 		this.clientService = clientService;
 		this.launchContextService = launchContextService;
+		this.preAuthorizedTokenService = preAuthorizedTokenService;
 	}
 
 	@GetMapping("/")
@@ -128,24 +125,30 @@ public class HomeController {
 	public ModelAndView showSandbox(Map<String, Object> model, @PathVariable Long id) {
 		final String MOCK_SELECTED_ACCOUNTS = "[{'id':2,'label':'user2'}]";
 		final String MOCK_AVAILABLE_ACCOUNTS = "[{'id':1,'label':'user1'},{'id':3,'label':'user3'},{'id':4,'label':'flimflamthemagicman'}]";
+		var securityHelper = new SecurityHelper(SecurityContextHolder.getContext());
 		var sandbox = sandboxService.findById(id).get();
 		var clients = sandboxService.getClientsForSandbox(sandbox);
+		var fhirServerUrl = sandboxService.getSandboxFhirUrl(sandbox);
 
-		ViewUtils.addPageScript(model, "launch-client.js");
+		ViewUtils.addPageScript(model, "launch-modal.ts");
 		ViewUtils.addPageScript(model, "copy-to-clipboard.js");
 		ViewUtils.addPageScript(model, "shared-account-selector.js");
+		var accessToken = preAuthorizedTokenService.generateToken(Map.of(
+				"sub", securityHelper.username(),
+				"aud", fhirServerUrl));
+
 		model.put("baseRoute", BASE_ROUTE);
 		model.put("entity", sandbox);
+		model.put("fhirServerUrl", fhirServerUrl);
 		model.put("fhirServerUrl", sandboxService.getSandboxFhirUrl(sandbox));
 		model.put("selectedAccountsJson", MOCK_SELECTED_ACCOUNTS);
 		model.put("availableAccountsJson", MOCK_AVAILABLE_ACCOUNTS);
 		model.put("updateSharingAction", BASE_ROUTE + "/" + sandbox.getId() + "/update_sharing");
 		model.put("clients", clients);
 		model.put("hasClients", !clients.isEmpty());
-		// TODO: RFS-249 remove stub IDs
-		model.put("stubPatientId", stubPatientId);
-		model.put("stubPractitionerId", stubPractitionerId);
 		model.put("preventDelete", !sandbox.getStatus().isDeletable());
+		model.put("accessToken", accessToken);
+
 		return new ModelAndView("home/sandbox_details", model);
 	}
 
@@ -243,8 +246,16 @@ public class HomeController {
 		return new ModelAndView("redirect:/sandboxes/" + sandboxId);
 	}
 
-	@PostMapping(value = "/create_context", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Map<String, Object> createLaunchContext(@RequestBody SmartLaunchContextProperties payload) {
+	@GetMapping("/sandboxes/{sandboxId}/registered_apps")
+	public List<FrontEndSmartApp> getSandboxClients(@PathVariable Long sandboxId) {
+		Sandbox sandbox = sandboxService.findById(sandboxId).get();
+		List<SmartClient> clients = sandboxService.getClientsForSandbox(sandbox);
+		return clients.stream().map(client -> toFrontEndSmartApp(client)).toList();
+	}
+
+	@PostMapping(value = "/sandboxes/{sandboxId}/create_context", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Map<String, Object> createLaunchContext(@PathVariable Long sandboxId,
+			@RequestBody SmartLaunchContextProperties payload) {
 		var response = new HashMap<String, Object>();
 
 		if (payload.clientId() == null) {
@@ -258,7 +269,7 @@ public class HomeController {
 		}
 
 		var context = launchContextService.createLaunchContext(payload);
-		response.put("id", context.getOpaqueId());
+		response.put("launch_id", context.getOpaqueId());
 
 		return response;
 	}
@@ -293,6 +304,11 @@ public class HomeController {
 		} else {
 			return BASE_ROUTE + "/" + sandbox.getId() + "/client/" + client.getId() + "/update";
 		}
+	}
+
+	private FrontEndSmartApp toFrontEndSmartApp(SmartClient client) {
+		return new FrontEndSmartApp(client.getClientId(), client.getName(), client.getLaunchUri(),
+				new FrontEndSmartAppSandbox(client.getSandbox().getServerPartitionName()));
 	}
 
 }

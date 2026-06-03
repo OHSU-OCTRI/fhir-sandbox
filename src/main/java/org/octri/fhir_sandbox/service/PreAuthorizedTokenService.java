@@ -12,7 +12,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
 /**
- * Generates signed JWT strings from an arbitrary claims payload using the authorization server's RSA key.
+ * Generates signed JWT strings from an arbitrary claims payload using the authorization server's key.
  */
 @Service
 public class PreAuthorizedTokenService {

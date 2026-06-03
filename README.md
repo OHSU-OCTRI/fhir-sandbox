@@ -25,7 +25,41 @@ By default there is a `home.mustache` template that uses a header layout (`layou
 
 Bootstrap 5 and jQuery 3 are both included in the templates. Additional CSS styles may be added to `static/css/main.css`.
 
-Tooling to integrate Vue components is also provided. Scripts to mount Vue applications should be saved to the `src/main/resources/frontend` directory and added to the `entry` block in [`webpack.config.js`](webpack.config.js), while single-file components should be added to `src/main/resources/frontend/components`. To mount a Vue application into a page, add the corresponding entrypoint script to the `pageScripts` array in a controller class. See `webpack.config.js`, `managed-content.js`, and `TranslationController.java` for a full example.
+Tooling to integrate Vue components is also provided. Scripts to mount Vue applications should be saved to the `src/main/resources/frontend` directory and added to the `input` array in [`vite.config.ts`](vite.config.ts).
+
+```typescript
+export default defineConfig({
+  base: '',
+  build: {
+    manifest: true,
+    outDir: 'target/classes/static',
+    rollupOptions: {
+      input: [
+        // NOTE: Add entry scripts to the input array
+        'src/main/resources/frontend/managed-content.js'
+      ],
+      output: {
+        // ...
+      }
+    }
+  },
+  // ...
+});
+```
+
+Components should be added to `src/main/resources/frontend/components`. To mount a Vue application into a page, add the corresponding entrypoint script to the `pageScripts` array in a controller class. See `vite.config.ts`, `managed-content.js`, and `TranslationController.java` for a full example.
+
+## Front End Tests
+
+Front end tests are implemented using [Vitest](https://vitest.dev/). To execute the front end tests, run one of the two provided npm scripts.
+
+```bash
+# To run tests once
+npm run test:ci
+
+# To watch files and run tests repeatedly
+npm test
+```
 
 ## Integration tests requiring a database
 

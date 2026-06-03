@@ -3,7 +3,7 @@
 # directory as the `docker-compose` command was run from
 services:
   app:
-    image: octri.ohsu.edu/fhir-sandbox
+    image: ghcr.io/ohsu-octri/fhir-sandbox
     volumes:
       - ./target/fhir-sandbox.jar:/app.jar
     environment:

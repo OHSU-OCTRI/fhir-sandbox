@@ -15,7 +15,7 @@
 
 	{{! Page-specific stylesheets can be specified in the view model }}
 	{{#pageStyles}}
-	<link rel="stylesheet" href="{{req.contextPath}}/assets/css/{{.}}">
+	<link rel="stylesheet" href="{{req.contextPath}}/{{.}}">
 	{{/pageStyles}}
 </head>
 <body>

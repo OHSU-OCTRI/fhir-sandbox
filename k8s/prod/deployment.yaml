@@ -34,7 +34,7 @@ spec:
         fsGroup: 5333
       containers:
       - name: fhir-sandbox
-        image: octri.ohsu.edu/fhir-sandbox:latest
+        image: ghcr.io/ohsu-octri/fhir-sandbox:latest
         imagePullPolicy: Always
         securityContext:
           allowPrivilegeEscalation: false
@@ -63,4 +63,4 @@ spec:
         secret:
           secretName: prod-mysql-truststore
       imagePullSecrets:
-      - name: octri-registry-cred
+      - name: ghcr-registry-cred

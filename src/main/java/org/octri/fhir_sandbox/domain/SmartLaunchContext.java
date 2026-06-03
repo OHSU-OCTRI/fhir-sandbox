@@ -85,4 +85,12 @@ public class SmartLaunchContext extends AbstractEntity {
 		return attributes.get(FHIR_USER_ATTRIBUTE);
 	}
 
+	public Map<String, Object> toMap() {
+		var mergedMap = new HashMap<String, Object>();
+		mergedMap.put("id", this.opaqueId);
+		mergedMap.put("clientId", this.clientId);
+		mergedMap.putAll(this.attributes);
+		return mergedMap;
+	}
+
 }
