@@ -50,7 +50,7 @@
 		<node.version>v24.15.0</node.version>
 		<authlib.version>4.0.0</authlib.version>
 		<commonlib.version>2.0.2-SNAPSHOT</commonlib.version>
-		<caffeine.version>3.1.8</caffeine.version>
+		<caffeine.version>3.2.4</caffeine.version>
 		<!-- Override version for MySQL 8.4 support -->
 		<flyway.version>11.15.0</flyway.version>
 		<hapifhir.version>8.8.1</hapifhir.version>
