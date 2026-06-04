@@ -19,7 +19,7 @@ const isLoading = ref(false);
 const errorMessage = ref('');
 
 // Shared fetch wrapper: sets loading/error state and syncs the response
-const fetchUsers = async (url: string, options: object = {}) => {
+const syncUsers = async (url: string, options: object = {}) => {
   isLoading.value = true;
   errorMessage.value = '';
   try {
@@ -43,7 +43,7 @@ const fetchUsers = async (url: string, options: object = {}) => {
 
 // POST a new shared-users list to the server
 const postUsers = (users: SharedUser[]) => {
-  fetchUsers(props.postEndpoint, {
+  syncUsers(props.postEndpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ const revokeAccess = (user: SharedUser) => {
   postUsers(shared.value.filter(u => u.id !== user.id));
 };
 
-onMounted(() => fetchUsers(props.getEndpoint));
+onMounted(() => syncUsers(props.getEndpoint));
 </script>
 
 <template>
