@@ -37,7 +37,7 @@ const selectionsUpdated = computed(() => {
 });
 
 /**
- * Selects the notShared user. If the entity was previously removed, it will be removed from
+ * Selects the user. If the user was previously removed, it will be removed from
  * removedSelections. Otherwise, it will be added to addedSelections.
  *
  * Afterward, optionSelect will be reset to undefined.
@@ -58,7 +58,7 @@ const selectUser = (user: Entity | undefined) => {
 };
 
 /**
- * Deselects the shared user. If the user was previously added, it will be removed from
+ * Deselects the user. If the user was previously added, it will be removed from
  * addedSelections. Otherwise, it will be added to removedSelections.
  *
  * Afterward, optionSelect will be reset to undefined.
