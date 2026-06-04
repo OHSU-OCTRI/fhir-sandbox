@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.octri.authentication.server.security.SecurityHelper;
@@ -24,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.Assert;
 import org.springframework.validation.BindingResult;
@@ -62,6 +64,23 @@ public class HomeController {
 		this.clientService = clientService;
 		this.launchContextService = launchContextService;
 		this.preAuthorizedTokenService = preAuthorizedTokenService;
+	}
+
+	/**
+	 * Record types for processing sandbox sharing requests
+	 */
+	public record SharedUser(
+			Long id,
+			String label) {
+	}
+
+	public record SharedUsersResponse(
+			SharedUser[] shared,
+			SharedUser[] notShared) {
+	}
+
+	public record SharedUsersRequest(
+			SharedUser[] users) {
 	}
 
 	@GetMapping("/")
@@ -129,6 +148,7 @@ public class HomeController {
 
 		ViewUtils.addPageScript(model, "launch-modal.ts");
 		ViewUtils.addPageScript(model, "copy-to-clipboard.js");
+		ViewUtils.addPageScript(model, "shared-account-selector.js");
 		var accessToken = preAuthorizedTokenService.generateToken(Map.of(
 				"sub", securityHelper.username(),
 				"aud", fhirServerUrl));
@@ -137,11 +157,38 @@ public class HomeController {
 		model.put("entity", sandbox);
 		model.put("fhirServerUrl", fhirServerUrl);
 		model.put("clients", clients);
-		model.put("hasClients", !clients.isEmpty());
 		model.put("preventDelete", !sandbox.getStatus().isDeletable());
 		model.put("accessToken", accessToken);
 
 		return new ModelAndView("home/sandbox_details", model);
+	}
+
+	@GetMapping("/sandboxes/{sandboxId}/shared-users")
+	public ResponseEntity<SharedUsersResponse> getSharedAccounts(
+			@PathVariable Long sandboxId) {
+		Optional<Sandbox> sandbox = sandboxService.findById(sandboxId);
+		if (sandbox.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		// TODO: Get the actual
+		final SharedUser[] MOCK_SELECTED_ACCOUNTS = {
+				new SharedUser(2l, "user2")
+		};
+		final SharedUser[] MOCK_AVAILABLE_ACCOUNTS = {
+				new SharedUser(1l, "user1"),
+				new SharedUser(3l, "user3"),
+				new SharedUser(4l, "flimflamthemagicman")
+		};
+		final SharedUsersResponse MOCK_DATA = new SharedUsersResponse(MOCK_SELECTED_ACCOUNTS,
+				MOCK_AVAILABLE_ACCOUNTS);
+		return ResponseEntity.ok().body(MOCK_DATA);
+	}
+
+	@PostMapping("/sandboxes/{sandboxId}/shared-users")
+	public ResponseEntity<SharedUsersResponse> getSharedAccounts(
+			@PathVariable Long sandboxId, @RequestBody SharedUsersRequest users) {
+		// TODO: Save the posted data
+		return getSharedAccounts(sandboxId);
 	}
 
 	@GetMapping("/sandboxes/{id}/edit")
