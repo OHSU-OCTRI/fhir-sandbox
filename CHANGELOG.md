@@ -64,3 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [unreleased]: https://github.com/OCTRI-Apps/fhir-sandbox/compare/v0.1.0...HEAD
 [0.1.0]: https://source.ohsu.edu/OCTRI-Apps/fhir-sandbox/releases/tag/v0.1.0
+
+### Dependencies
+
+- Bump `org.octri.common:common_lib` from 2.0.2-SNAPSHOT to 2.1.0 ([#40](https://github.com/OHSU-OCTRI/fhir-sandbox/pull/40))
