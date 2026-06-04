@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.octri.authentication.server.security.SecurityHelper;
@@ -24,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.Assert;
 import org.springframework.validation.BindingResult;
@@ -37,7 +39,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 /**
@@ -63,6 +64,23 @@ public class HomeController {
 		this.clientService = clientService;
 		this.launchContextService = launchContextService;
 		this.preAuthorizedTokenService = preAuthorizedTokenService;
+	}
+
+	/**
+	 * Record types for processing sandbox sharing requests
+	 */
+	public record SharedUser(
+			Long id,
+			String label) {
+	}
+
+	public record SharedUsersResponse(
+			SharedUser[] shared,
+			SharedUser[] notShared) {
+	}
+
+	public record SharedUsersRequest(
+			SharedUser[] users) {
 	}
 
 	@GetMapping("/")
@@ -123,8 +141,6 @@ public class HomeController {
 
 	@GetMapping("/sandboxes/{id}")
 	public ModelAndView showSandbox(Map<String, Object> model, @PathVariable Long id) {
-		final String MOCK_SELECTED_ACCOUNTS = "[{'id':2,'label':'user2'}]";
-		final String MOCK_AVAILABLE_ACCOUNTS = "[{'id':1,'label':'user1'},{'id':3,'label':'user3'},{'id':4,'label':'flimflamthemagicman'}]";
 		var securityHelper = new SecurityHelper(SecurityContextHolder.getContext());
 		var sandbox = sandboxService.findById(id).get();
 		var clients = sandboxService.getClientsForSandbox(sandbox);
@@ -140,26 +156,39 @@ public class HomeController {
 		model.put("baseRoute", BASE_ROUTE);
 		model.put("entity", sandbox);
 		model.put("fhirServerUrl", fhirServerUrl);
-		model.put("fhirServerUrl", sandboxService.getSandboxFhirUrl(sandbox));
-		model.put("selectedAccountsJson", MOCK_SELECTED_ACCOUNTS);
-		model.put("availableAccountsJson", MOCK_AVAILABLE_ACCOUNTS);
-		model.put("updateSharingAction", BASE_ROUTE + "/" + sandbox.getId() + "/update_sharing");
 		model.put("clients", clients);
-		model.put("hasClients", !clients.isEmpty());
 		model.put("preventDelete", !sandbox.getStatus().isDeletable());
 		model.put("accessToken", accessToken);
 
 		return new ModelAndView("home/sandbox_details", model);
 	}
 
-	@PostMapping("sandboxes/{id}/update_sharing")
-	public ModelAndView updateSharing(Map<String, Object> model, @PathVariable Long id,
-			@RequestParam(value = "addSharing[]") List<Long> addSharing,
-			@RequestParam(value = "removeSharing[]") List<Long> removeSharing, HttpServletRequest request) {
-		var entity = sandboxService.findById(id).get();
-		// TODO: process POST request
+	@GetMapping("/sandboxes/{sandboxId}/shared-users")
+	public ResponseEntity<SharedUsersResponse> getSharedAccounts(
+			@PathVariable Long sandboxId) {
+		Optional<Sandbox> sandbox = sandboxService.findById(sandboxId);
+		if (sandbox.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		// TODO: Get the actual
+		final SharedUser[] MOCK_SELECTED_ACCOUNTS = {
+				new SharedUser(2l, "user2")
+		};
+		final SharedUser[] MOCK_AVAILABLE_ACCOUNTS = {
+				new SharedUser(1l, "user1"),
+				new SharedUser(3l, "user3"),
+				new SharedUser(4l, "flimflamthemagicman")
+		};
+		final SharedUsersResponse MOCK_DATA = new SharedUsersResponse(MOCK_SELECTED_ACCOUNTS,
+				MOCK_AVAILABLE_ACCOUNTS);
+		return ResponseEntity.ok().body(MOCK_DATA);
+	}
 
-		return new ModelAndView("redirect:/sandboxes/" + entity.getId());
+	@PostMapping("/sandboxes/{sandboxId}/shared-users")
+	public ResponseEntity<SharedUsersResponse> getSharedAccounts(
+			@PathVariable Long sandboxId, @RequestBody SharedUsersRequest users) {
+		// TODO: Save the posted data
+		return getSharedAccounts(sandboxId);
 	}
 
 	@GetMapping("/sandboxes/{id}/edit")
