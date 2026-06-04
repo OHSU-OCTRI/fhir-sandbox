@@ -12,23 +12,11 @@ interface SharedUser {
   label: string;
 }
 
-interface SharedUsersResponse {
-  shared: SharedUser[];
-  notShared: SharedUser[];
-}
-
 const shared = ref<SharedUser[]>([]);
 const notShared = ref<SharedUser[]>([]);
 const selectedUser = ref<SharedUser | undefined>(undefined);
 const isLoading = ref(false);
 const errorMessage = ref('');
-
-// Sync local state from an API response
-const applyResponse = (data: SharedUsersResponse) => {
-  shared.value = data.shared;
-  notShared.value = data.notShared;
-  selectedUser.value = undefined;
-};
 
 // Shared fetch wrapper: sets loading/error state and syncs the response
 const fetchUsers = async (url: string, options: object = {}) => {
@@ -36,8 +24,15 @@ const fetchUsers = async (url: string, options: object = {}) => {
   errorMessage.value = '';
   try {
     const response = await fetch(url, options);
-    if (!response.ok) throw new Error(`HTTP error (status ${response.status})`);
-    applyResponse((await response.json()) as SharedUsersResponse);
+    if (!response.ok) {
+      throw new Error(`HTTP error (status ${response.status})`);
+    }
+    const data = await response.json();
+
+    // Sync local state from an API response
+    shared.value = data.shared;
+    notShared.value = data.notShared;
+    selectedUser.value = undefined;
   } catch (error) {
     console.error('Shared users request failed:', error);
     errorMessage.value = 'Something went wrong. Please try again later.';
@@ -58,11 +53,13 @@ const postUsers = (users: SharedUser[]) => {
   });
 };
 
+// Share the Sandbox with the selected user
 const grantAccess = () => {
   if (!selectedUser.value) return;
   postUsers([selectedUser.value, ...shared.value]);
 };
 
+// Revoke Sandbox access from the provided user
 const revokeAccess = (user: SharedUser) => {
   postUsers(shared.value.filter(u => u.id !== user.id));
 };
