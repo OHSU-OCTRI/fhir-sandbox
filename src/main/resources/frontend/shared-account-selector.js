@@ -1,4 +1,5 @@
 import { createApp } from 'vue';
+import getCsrfToken from './utils/getCsrfToken.ts';
 import SandboxSharing from './components/SandboxSharing.vue';
 
 /**
@@ -14,11 +15,10 @@ import SandboxSharing from './components/SandboxSharing.vue';
  */
 
 const mount = document.querySelector('#shared_users_selector');
-const csrfTokenInput = mount.querySelector('input[name="_csrf"]');
 
 const app = createApp(SandboxSharing, {
   getEndpoint: mount.dataset.getEndpoint,
   postEndpoint: mount.dataset.postEndpoint,
-  csrfToken: csrfTokenInput ? csrfTokenInput.value : ''
+  csrfToken: getCsrfToken()
 });
 app.mount('#shared_users_selector');
