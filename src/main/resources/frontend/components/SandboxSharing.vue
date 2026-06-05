@@ -42,8 +42,8 @@ const syncUsers = async (url: string, options: object = {}) => {
 };
 
 // POST a new shared-users list to the server
-const postUsers = (users: SharedUser[]) => {
-  syncUsers(props.postEndpoint, {
+const postUsers = async (users: SharedUser[]) => {
+  await syncUsers(props.postEndpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -54,14 +54,23 @@ const postUsers = (users: SharedUser[]) => {
 };
 
 // Share the Sandbox with the selected user
-const grantAccess = () => {
+const grantAccess = async () => {
   if (!selectedUser.value) return;
-  postUsers([selectedUser.value, ...shared.value]);
+  // Post the change and check that it persisted
+  const user = selectedUser.value;
+  await postUsers([selectedUser.value, ...shared.value]);
+  if (notShared.value.includes(user) && !errorMessage.value) {
+    errorMessage.value = `Failed to share sandox with ${user.label}`;
+  }
 };
 
 // Revoke Sandbox access from the provided user
-const revokeAccess = (user: SharedUser) => {
-  postUsers(shared.value.filter(u => u.id !== user.id));
+const revokeAccess = async (user: SharedUser) => {
+  await postUsers(shared.value.filter(u => u.id !== user.id));
+  // Check that the change was persisted
+  if (shared.value.includes(user) && !errorMessage.value) {
+    errorMessage.value = `Failed to revoke access from ${user.label}`;
+  }
 };
 
 onMounted(() => syncUsers(props.getEndpoint));

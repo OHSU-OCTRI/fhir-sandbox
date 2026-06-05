@@ -1,15 +1,23 @@
 package org.octri.fhir_sandbox.domain;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.octri.authentication.server.security.entity.User;
 import org.octri.common.domain.AbstractEntity;
 import org.octri.common.view.Labelled;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -22,9 +30,16 @@ public class Sandbox extends AbstractEntity implements Labelled {
 	private User owner;
 
 	@NotNull
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(name = "sandbox_sharing", joinColumns = {
+			@JoinColumn(name = "sandbox") }, inverseJoinColumns = { @JoinColumn(name = "user") })
+	private List<User> authorizedUsers = new ArrayList<>();
+
+	@NotNull
 	@Size(max = 200)
 	private String description;
 
+	@JsonIgnore
 	@NotNull
 	@Enumerated(value = EnumType.STRING)
 	private SandboxStatus status;
@@ -43,6 +58,14 @@ public class Sandbox extends AbstractEntity implements Labelled {
 
 	public void setOwner(User owner) {
 		this.owner = owner;
+	}
+
+	public List<User> getAuthorizedUsers() {
+		return authorizedUsers;
+	}
+
+	public void setAuthorizedUsers(List<User> authorizedUsers) {
+		this.authorizedUsers = authorizedUsers;
 	}
 
 	public String getDescription() {

@@ -4,6 +4,8 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -75,12 +77,12 @@ public class HomeController {
 	}
 
 	public record SharedUsersResponse(
-			SharedUser[] shared,
-			SharedUser[] notShared) {
+			List<SharedUser> shared,
+			List<SharedUser> notShared) {
 	}
 
 	public record SharedUsersRequest(
-			SharedUser[] users) {
+			List<SharedUser> users) {
 	}
 
 	@GetMapping("/")
@@ -170,24 +172,35 @@ public class HomeController {
 		if (sandbox.isEmpty()) {
 			return ResponseEntity.notFound().build();
 		}
-		// TODO: Get the actual
-		final SharedUser[] MOCK_SELECTED_ACCOUNTS = {
-				new SharedUser(2l, "user2")
-		};
-		final SharedUser[] MOCK_AVAILABLE_ACCOUNTS = {
-				new SharedUser(1l, "user1"),
-				new SharedUser(3l, "user3"),
-				new SharedUser(4l, "flimflamthemagicman")
-		};
-		final SharedUsersResponse MOCK_DATA = new SharedUsersResponse(MOCK_SELECTED_ACCOUNTS,
-				MOCK_AVAILABLE_ACCOUNTS);
-		return ResponseEntity.ok().body(MOCK_DATA);
+
+		var shared = sandbox.get().getAuthorizedUsers()
+				.stream()
+				.map(user -> new SharedUser(user.getId(), user.getUsername()))
+				.toList();
+		var notShared = userService.findAll()
+				.stream()
+				.map(user -> new SharedUser(user.getId(), user.getUsername()))
+				.filter(user -> !shared.contains(user))
+				.toList();
+		return ResponseEntity.ok().body(new SharedUsersResponse(shared, notShared));
 	}
 
 	@PostMapping("/sandboxes/{sandboxId}/shared-users")
-	public ResponseEntity<SharedUsersResponse> getSharedAccounts(
+	public ResponseEntity<SharedUsersResponse> postSharedAccounts(
 			@PathVariable Long sandboxId, @RequestBody SharedUsersRequest users) {
-		// TODO: Save the posted data
+		Sandbox sandbox = sandboxService.findById(sandboxId).get();
+		var usersList = users.users.stream()
+				.map(userRecord -> {
+					try {
+						return userService.find(userRecord.id());
+					} catch (NoSuchElementException e) {
+						log.error("Could not find user id " + userRecord.id(), e);
+						return null;
+					}
+				})
+				.filter(Objects::nonNull).toList();
+		sandbox.setAuthorizedUsers(usersList);
+		sandboxService.save(sandbox);
 		return getSharedAccounts(sandboxId);
 	}
 
