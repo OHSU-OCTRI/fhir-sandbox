@@ -2,6 +2,7 @@ package org.octri.fhir_sandbox.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -77,7 +78,12 @@ public class SandboxService {
 	 * @return
 	 */
 	public List<Sandbox> getSandboxesForUser(User user) {
-		return repository.findByOwner(user);
+		var ownedSandboxes = repository.findByOwner(user);
+		return Stream.concat(
+				ownedSandboxes.stream(),
+				repository.findByAuthorizedUsers_Id(user.getId()).stream()
+						.filter(sb -> ownedSandboxes.stream().noneMatch(ownedSb -> ownedSb.getId() == sb.getId())))
+				.toList();
 	}
 
 	/**

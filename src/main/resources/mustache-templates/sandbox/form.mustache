@@ -33,6 +33,9 @@
 <input type="hidden" id="server_partition_id" name="serverPartitionId" value="{{#serverPartitionId}}{{.}}{{/serverPartitionId}}" required>
 <input type="hidden" id="server_partition_name" name="serverPartitionName" value="{{#serverPartitionName}}{{.}}{{/serverPartitionName}}" required>
 <input type="hidden" id="status" name="status" value="{{#status}}{{.}}{{/status}}" required>
+{{#authorizedUsers}}
+<input type="hidden" id="authorized_user_{{id}}" name="authorizedUsers[]" value="{{#id}}{{.}}{{/id}}" required>
+{{/authorizedUsers}}
 
 {{/entity}}
 {{>components/form_end}}
