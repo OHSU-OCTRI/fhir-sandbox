@@ -1,14 +1,12 @@
 package org.octri.fhir_sandbox.domain;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import org.octri.authentication.server.security.entity.User;
 import org.octri.common.domain.AbstractEntity;
 import org.octri.common.view.Labelled;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -33,13 +31,12 @@ public class Sandbox extends AbstractEntity implements Labelled {
 	@ManyToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "sandbox_sharing", joinColumns = {
 			@JoinColumn(name = "sandbox") }, inverseJoinColumns = { @JoinColumn(name = "user") })
-	private List<User> authorizedUsers = new ArrayList<>();
+	private Set<User> authorizedUsers = new HashSet<>();
 
 	@NotNull
 	@Size(max = 200)
 	private String description;
 
-	@JsonIgnore
 	@NotNull
 	@Enumerated(value = EnumType.STRING)
 	private SandboxStatus status;
@@ -60,11 +57,11 @@ public class Sandbox extends AbstractEntity implements Labelled {
 		this.owner = owner;
 	}
 
-	public List<User> getAuthorizedUsers() {
+	public Set<User> getAuthorizedUsers() {
 		return authorizedUsers;
 	}
 
-	public void setAuthorizedUsers(List<User> authorizedUsers) {
+	public void setAuthorizedUsers(Set<User> authorizedUsers) {
 		this.authorizedUsers = authorizedUsers;
 	}
 

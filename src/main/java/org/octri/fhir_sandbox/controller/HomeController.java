@@ -2,6 +2,7 @@ package org.octri.fhir_sandbox.controller;
 
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -189,7 +190,7 @@ public class HomeController {
 	public ResponseEntity<SharedUsersResponse> postSharedAccounts(
 			@PathVariable Long sandboxId, @RequestBody SharedUsersRequest users) {
 		Sandbox sandbox = sandboxService.findById(sandboxId).get();
-		var usersList = users.users.stream()
+		var usersSet = new HashSet<>(users.users.stream()
 				.map(userRecord -> {
 					try {
 						return userService.find(userRecord.id());
@@ -198,8 +199,8 @@ public class HomeController {
 						return null;
 					}
 				})
-				.filter(Objects::nonNull).toList();
-		sandbox.setAuthorizedUsers(usersList);
+				.filter(Objects::nonNull).toList());
+		sandbox.setAuthorizedUsers(usersSet);
 		sandboxService.save(sandbox);
 		return getSharedAccounts(sandboxId);
 	}
