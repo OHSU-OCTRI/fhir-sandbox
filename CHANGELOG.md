@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a service to generate access tokens without going through the OAuth flow. (RFS-249)
 - Add ability to easily copy client ID (RFS-258)
 - Add UI for selecting app launch practitioner and patient. (RFS-249)
+- Added Sandbox sharing between users (RFS-259)
 
 ### Changed
 
