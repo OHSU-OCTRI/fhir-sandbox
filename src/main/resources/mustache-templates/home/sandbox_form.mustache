@@ -11,16 +11,16 @@
 
 {{! Hides the initialization controls if the Entity has previously been saved }}
 {{^id}}
-<div class="form-group">
-    <label>{{#i18n}}sandbox.initControls.header{{/i18n}}</label>
-    <div>
-        <input class="form-check-input" type="checkbox" name="importSampleData">
-        <label class="form-check-label" for="importSampleData">
+<fieldset>
+    <legend>{{#i18n}}sandbox.initControls.header{{/i18n}}</legend>
+    <div class="form-group">
+        <input class="form-check-input" id="import_sample_data" type="checkbox" name="importSampleData">
+        <label class="form-check-label" for="import_sample_data">
             {{#i18n}}sandbox.initControls.importSampleData.label{{/i18n}}
         </label>
         <input type="hidden" name="importSampleData" value="false">
     </div>
-</div>
+</fieldset>
 {{/id}}
 
 <input type="hidden" id="server_partition_id" name="serverPartitionId" value="{{#serverPartitionId}}{{.}}{{/serverPartitionId}}" required>

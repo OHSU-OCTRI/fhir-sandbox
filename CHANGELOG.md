@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add ability to easily copy client ID (RFS-258)
 - Add UI for selecting app launch practitioner and patient. (RFS-249)
 - Added Sandbox sharing between users (RFS-259)
+- Ensure that requests to create partitions and load sample data have a valid bearer token (RFS-293)
 
 ### Changed
 
@@ -62,6 +63,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   OAuth clients are cleaned up. Fixes a bug where OAuth clients were orphaned on delete.
 - Only add `fhirUser` claim to the OIDC ID token if the `fhirUser` scope was approved. (RFS-287)
 - Corrected repository URLs in pom.xml
+- Add ID to checkbox in sandbox form to fix accessibility issue
 
 [unreleased]: https://github.com/OCTRI-Apps/fhir-sandbox/compare/v0.1.0...HEAD
 [0.1.0]: https://source.ohsu.edu/OCTRI-Apps/fhir-sandbox/releases/tag/v0.1.0
