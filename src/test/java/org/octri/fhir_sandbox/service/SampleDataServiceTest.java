@@ -2,6 +2,7 @@ package org.octri.fhir_sandbox.service;
 
 import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.description;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -44,6 +45,10 @@ public class SampleDataServiceTest {
 	FhirServerProperties fhirServerProperties;
 	@Mock
 	FhirContext fhirContext;
+	@Mock
+	IGenericClient fhirClient;
+	@Mock
+	PreAuthorizedTokenService preAuthorizedTokenService;
 
 	SampleDataService sampleDataService;
 
@@ -69,7 +74,7 @@ public class SampleDataServiceTest {
 		// Socket timeout configuration requires addition stubbing
 		when(fhirContext.getRestfulClientFactory()).thenReturn(mock(IRestfulClientFactory.class));
 		sampleDataService = new SampleDataService(dataConfig, resourcePatternResolver, fhirServerProperties,
-				fhirContext);
+				fhirContext, preAuthorizedTokenService);
 
 		// Mock data resources
 		ancillaryResources = new Resource[1];
@@ -86,6 +91,7 @@ public class SampleDataServiceTest {
 
 	@Test
 	public void testExceptionResolvingDependecyData() throws IOException {
+		when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(fhirClient);
 		doThrow(new IOException()).when(resourcePatternResolver).getResources(ancillaryDataPattern);
 		assertThrows(UncheckedIOException.class, () -> {
 			sampleDataService.loadSampleData(fhirUrl);
@@ -96,6 +102,7 @@ public class SampleDataServiceTest {
 
 	@Test
 	public void testExceptionParsingDependecyData() throws IOException {
+		when(fhirContext.newRestfulGenericClient(anyString())).thenReturn(fhirClient);
 		when(resourcePatternResolver.getResources(ancillaryDataPattern)).thenReturn(ancillaryResources);
 		utilities.when(() -> FhirDataUtil.readFhirJson(ancillaryResources[0], Bundle.class))
 				.thenThrow(new UncheckedIOException(new IOException()));

@@ -1,15 +1,19 @@
 package org.octri.fhir_sandbox.service;
 
+import java.time.Duration;
+
 import org.hl7.fhir.r4.model.CodeType;
 import org.hl7.fhir.r4.model.IntegerType;
 import org.hl7.fhir.r4.model.Parameters;
 import org.hl7.fhir.r4.model.StringType;
 import org.octri.fhir_sandbox.config.FhirServerProperties;
 import org.octri.fhir_sandbox.domain.Sandbox;
+import org.octri.fhir_sandbox.oauth2.utils.OAuthUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.client.interceptor.BearerTokenAuthInterceptor;
 
 /**
  * Service for managing partitions in the backend FHIR server
@@ -17,12 +21,18 @@ import ca.uhn.fhir.context.FhirContext;
 @Service
 public class PartitionService {
 
+	private static final String CREATE_PARTITION_OPERATION = "$partition-management-create-partition";
+	private static final String DELETE_PARTITION_OPERATION = "$partition-management-delete-partition";
+
 	private final FhirServerProperties fhirServerProperties;
 	private final FhirContext fhirContext;
+	private final PreAuthorizedTokenService tokenService;
 
-	public PartitionService(FhirServerProperties fhirServerProperties, FhirContext fhirContext) {
+	public PartitionService(FhirServerProperties fhirServerProperties, FhirContext fhirContext,
+			PreAuthorizedTokenService tokenService) {
 		this.fhirContext = fhirContext;
 		this.fhirServerProperties = fhirServerProperties;
+		this.tokenService = tokenService;
 	}
 
 	/**
@@ -32,17 +42,16 @@ public class PartitionService {
 	 */
 	public void createPartitionForSandbox(Sandbox sandbox) {
 		var fhirClient = fhirContext.newRestfulGenericClient(getDefaultPartitionUrl());
-		var parameters = new Parameters();
+		fhirClient.registerInterceptor(createTokenInterceptor());
 
-		// TODO: use constants for parameter names
+		var parameters = new Parameters();
 		parameters.addParameter("name", new CodeType(sandbox.getServerPartitionName()));
 		parameters.addParameter("description", new StringType(sandbox.getDescription()));
 
-		// TODO: use constants for operation name
 		var response = fhirClient
 				.operation()
 				.onServer()
-				.named("$partition-management-create-partition")
+				.named(CREATE_PARTITION_OPERATION)
 				.withParameters(parameters).execute();
 
 		// TODO: check for and handle errors
@@ -57,12 +66,15 @@ public class PartitionService {
 	 */
 	public void deletePartitionForSandbox(Sandbox sandbox) {
 		var fhirClient = fhirContext.newRestfulGenericClient(getDefaultPartitionUrl());
+		fhirClient.registerInterceptor(createTokenInterceptor());
+
 		var parameters = new Parameters();
 		parameters.addParameter().setName("id").setValue(new IntegerType(sandbox.getServerPartitionId()));
+
 		var response = fhirClient
 				.operation()
 				.onServer()
-				.named("$partition-management-delete-partition")
+				.named(DELETE_PARTITION_OPERATION)
 				.withParameters(parameters).execute();
 		// TODO: check and handle errors
 	}
@@ -89,4 +101,11 @@ public class PartitionService {
 		uriBuilder.pathSegment(partitionName).path("/");
 		return uriBuilder.build().toUriString();
 	}
+
+	private BearerTokenAuthInterceptor createTokenInterceptor() {
+		return new BearerTokenAuthInterceptor(
+				tokenService.generateToken(OAuthUtils.getSystemClaimsForSandbox(getDefaultPartitionUrl()),
+						Duration.ofMinutes(1)));
+	}
+
 }
