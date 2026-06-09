@@ -72,18 +72,18 @@ public class HomeController {
 	/**
 	 * Record types for processing sandbox sharing requests
 	 */
-	public record SharedUser(
+	public record SandboxUser(
 			Long id,
 			String label) {
 	}
 
-	public record SharedUsersResponse(
-			List<SharedUser> shared,
-			List<SharedUser> notShared) {
+	public record SandboxUsersResponse(
+			List<SandboxUser> shared,
+			List<SandboxUser> notShared) {
 	}
 
-	public record SharedUsersRequest(
-			List<SharedUser> users) {
+	public record SandboxUsersRequest(
+			List<SandboxUser> users) {
 	}
 
 	@GetMapping("/")
@@ -166,31 +166,32 @@ public class HomeController {
 		return new ModelAndView("home/sandbox_details", model);
 	}
 
-	@GetMapping("/sandboxes/{sandboxId}/shared-users")
-	public ResponseEntity<SharedUsersResponse> getSharedAccounts(
+	@GetMapping("/sandboxes/{sandboxId}/shared_users")
+	public ResponseEntity<SandboxUsersResponse> getSharedAccounts(
 			@PathVariable Long sandboxId) {
 		Optional<Sandbox> sandbox = sandboxService.findById(sandboxId);
 		if (sandbox.isEmpty()) {
 			return ResponseEntity.notFound().build();
 		}
 
+		var owner = sandbox.get().getOwner();
 		var shared = sandbox.get().getAuthorizedUsers()
 				.stream()
-				.map(user -> new SharedUser(user.getId(), user.getUsername()))
+				.map(user -> new SandboxUser(user.getId(), user.getUsername()))
 				.toList();
 		var notShared = userService.findAll()
 				.stream()
-				.map(user -> new SharedUser(user.getId(), user.getUsername()))
-				.filter(user -> !shared.contains(user))
+				.map(user -> new SandboxUser(user.getId(), user.getUsername()))
+				.filter(user -> !shared.contains(user) && user.id() != owner.getId())
 				.toList();
-		return ResponseEntity.ok().body(new SharedUsersResponse(shared, notShared));
+		return ResponseEntity.ok().body(new SandboxUsersResponse(shared, notShared));
 	}
 
-	@PostMapping("/sandboxes/{sandboxId}/shared-users")
-	public ResponseEntity<SharedUsersResponse> postSharedAccounts(
-			@PathVariable Long sandboxId, @RequestBody SharedUsersRequest users) {
+	@PostMapping("/sandboxes/{sandboxId}/shared_users")
+	public ResponseEntity<SandboxUsersResponse> postSharedAccounts(
+			@PathVariable Long sandboxId, @RequestBody SandboxUsersRequest request) {
 		Sandbox sandbox = sandboxService.findById(sandboxId).get();
-		var usersSet = new HashSet<>(users.users.stream()
+		var usersSet = new HashSet<>(request.users.stream()
 				.map(userRecord -> {
 					try {
 						return userService.find(userRecord.id());

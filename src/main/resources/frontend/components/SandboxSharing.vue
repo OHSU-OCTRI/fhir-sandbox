@@ -2,19 +2,18 @@
 import { ref, onMounted } from 'vue';
 
 const props = defineProps<{
-  getEndpoint: string;
-  postEndpoint: string;
+  endpoint: string;
   csrfToken: string;
 }>();
 
-interface SharedUser {
+interface SandboxUser {
   id: number;
   label: string;
 }
 
-const shared = ref<SharedUser[]>([]);
-const notShared = ref<SharedUser[]>([]);
-const selectedUser = ref<SharedUser | undefined>(undefined);
+const shared = ref<SandboxUser[]>([]);
+const notShared = ref<SandboxUser[]>([]);
+const selectedUser = ref<SandboxUser | undefined>(undefined);
 const isLoading = ref(false);
 const errorMessage = ref('');
 
@@ -42,8 +41,8 @@ const syncUsers = async (url: string, options: object = {}) => {
 };
 
 // POST a new shared-users list to the server
-const postUsers = async (users: SharedUser[]) => {
-  await syncUsers(props.postEndpoint, {
+const postUsers = async (users: SandboxUser[]) => {
+  await syncUsers(props.endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -65,7 +64,7 @@ const grantAccess = async () => {
 };
 
 // Revoke Sandbox access from the provided user
-const revokeAccess = async (user: SharedUser) => {
+const revokeAccess = async (user: SandboxUser) => {
   await postUsers(shared.value.filter(u => u.id !== user.id));
   // Check that the change was persisted
   if (shared.value.includes(user) && !errorMessage.value) {
@@ -73,7 +72,7 @@ const revokeAccess = async (user: SharedUser) => {
   }
 };
 
-onMounted(() => syncUsers(props.getEndpoint));
+onMounted(() => syncUsers(props.endpoint));
 </script>
 
 <template>

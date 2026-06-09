@@ -17,8 +17,7 @@ import SandboxSharing from './components/SandboxSharing.vue';
 const mount = document.querySelector('#shared_users_selector');
 
 const app = createApp(SandboxSharing, {
-  getEndpoint: mount.dataset.getEndpoint,
-  postEndpoint: mount.dataset.postEndpoint,
+  endpoint: mount.dataset.endpoint,
   csrfToken: getCsrfToken()
 });
 app.mount('#shared_users_selector');

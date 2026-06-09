@@ -26,10 +26,7 @@
 	{{#entity.status.isReady}}
 	<div class="vertical-space">
 		<h2>Sandbox Sharing</h2>
-		<div id="shared_users_selector" 
-			data-get-endpoint="{{req.contextPath}}{{baseRoute}}/{{entity.id}}/shared-users"
-			data-post-endpoint="{{req.contextPath}}{{baseRoute}}/{{entity.id}}/shared-users">
-		</div>
+		<div id="shared_users_selector" data-endpoint="{{req.contextPath}}{{baseRoute}}/{{entity.id}}/shared_users"></div>
 	</div>
 
 	<div class="vertical-space">

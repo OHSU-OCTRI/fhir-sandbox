@@ -78,11 +78,9 @@ public class SandboxService {
 	 * @return
 	 */
 	public List<Sandbox> getSandboxesForUser(User user) {
-		var ownedSandboxes = repository.findByOwner(user);
 		return Stream.concat(
-				ownedSandboxes.stream(),
-				repository.findByAuthorizedUsers_Id(user.getId()).stream()
-						.filter(sb -> ownedSandboxes.stream().noneMatch(ownedSb -> ownedSb.getId() == sb.getId())))
+				repository.findByOwner(user).stream(),
+				repository.findByAuthorizedUsersId(user.getId()).stream())
 				.toList();
 	}
 
