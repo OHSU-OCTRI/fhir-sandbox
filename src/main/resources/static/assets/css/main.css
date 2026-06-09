@@ -112,3 +112,28 @@ div.parent-summary strong {
 	flex: 1;
 	min-height: 0;
 }
+
+/* Sandbox sharing account selector */
+#shared_accounts_selector {
+	margin-bottom: 1rem;
+}
+
+#shared_accounts_selector h5 {
+	margin-top: 0.5rem;
+}
+
+.current-selections .badge {
+	background-color: #3b82ecf0;
+}
+
+.current-selections .badge i:hover {
+	cursor: pointer;
+}
+
+.selection-controls select {
+	width: min(70%, 13rem);
+}
+
+.selection-controls button {
+	margin-top: 0.5rem;
+}

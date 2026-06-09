@@ -12,4 +12,6 @@ public interface SandboxRepository extends CrudRepository<Sandbox, Long> {
 	List<Sandbox> findByOwner(User owner);
 
 	List<Sandbox> findByStatus(SandboxStatus status);
+
+	List<Sandbox> findByAuthorizedUsersId(Long id);
 }

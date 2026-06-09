@@ -12,7 +12,8 @@ export default defineConfig({
     rollupOptions: {
       input: [
         'src/main/resources/frontend/launch-modal.ts',
-        'src/main/resources/frontend/managed-content.js'
+        'src/main/resources/frontend/managed-content.js',
+        'src/main/resources/frontend/shared-account-selector.js'
       ],
       output: {
         entryFileNames: 'assets/js/[name]-[hash].js',

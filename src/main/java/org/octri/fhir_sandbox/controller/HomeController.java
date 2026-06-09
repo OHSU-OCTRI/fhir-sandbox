@@ -2,8 +2,12 @@ package org.octri.fhir_sandbox.controller;
 
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.octri.authentication.server.security.SecurityHelper;
@@ -24,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.Assert;
 import org.springframework.validation.BindingResult;
@@ -62,6 +67,23 @@ public class HomeController {
 		this.clientService = clientService;
 		this.launchContextService = launchContextService;
 		this.preAuthorizedTokenService = preAuthorizedTokenService;
+	}
+
+	/**
+	 * Record types for processing sandbox sharing requests
+	 */
+	public record SandboxUser(
+			Long id,
+			String label) {
+	}
+
+	public record SandboxUsersResponse(
+			List<SandboxUser> shared,
+			List<SandboxUser> notShared) {
+	}
+
+	public record SandboxUsersRequest(
+			List<SandboxUser> users) {
 	}
 
 	@GetMapping("/")
@@ -129,6 +151,7 @@ public class HomeController {
 
 		ViewUtils.addPageScript(model, "launch-modal.ts");
 		ViewUtils.addPageScript(model, "copy-to-clipboard.js");
+		ViewUtils.addPageScript(model, "shared-account-selector.js");
 		var accessToken = preAuthorizedTokenService.generateToken(Map.of(
 				"sub", securityHelper.username(),
 				"aud", fhirServerUrl));
@@ -137,11 +160,50 @@ public class HomeController {
 		model.put("entity", sandbox);
 		model.put("fhirServerUrl", fhirServerUrl);
 		model.put("clients", clients);
-		model.put("hasClients", !clients.isEmpty());
 		model.put("preventDelete", !sandbox.getStatus().isDeletable());
 		model.put("accessToken", accessToken);
 
 		return new ModelAndView("home/sandbox_details", model);
+	}
+
+	@GetMapping("/sandboxes/{sandboxId}/shared_users")
+	public ResponseEntity<SandboxUsersResponse> getSharedAccounts(
+			@PathVariable Long sandboxId) {
+		Optional<Sandbox> sandbox = sandboxService.findById(sandboxId);
+		if (sandbox.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+
+		var owner = sandbox.get().getOwner();
+		var shared = sandbox.get().getAuthorizedUsers()
+				.stream()
+				.map(user -> new SandboxUser(user.getId(), user.getUsername()))
+				.toList();
+		var notShared = userService.findAll()
+				.stream()
+				.map(user -> new SandboxUser(user.getId(), user.getUsername()))
+				.filter(user -> !shared.contains(user) && user.id() != owner.getId())
+				.toList();
+		return ResponseEntity.ok().body(new SandboxUsersResponse(shared, notShared));
+	}
+
+	@PostMapping("/sandboxes/{sandboxId}/shared_users")
+	public ResponseEntity<SandboxUsersResponse> postSharedAccounts(
+			@PathVariable Long sandboxId, @RequestBody SandboxUsersRequest request) {
+		Sandbox sandbox = sandboxService.findById(sandboxId).get();
+		var usersSet = new HashSet<>(request.users.stream()
+				.map(userRecord -> {
+					try {
+						return userService.find(userRecord.id());
+					} catch (NoSuchElementException e) {
+						log.error("Could not find user id " + userRecord.id(), e);
+						return null;
+					}
+				})
+				.filter(Objects::nonNull).toList());
+		sandbox.setAuthorizedUsers(usersSet);
+		sandboxService.save(sandbox);
+		return getSharedAccounts(sandboxId);
 	}
 
 	@GetMapping("/sandboxes/{id}/edit")
