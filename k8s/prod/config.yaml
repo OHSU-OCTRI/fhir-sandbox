@@ -13,6 +13,6 @@ data:
   TZ: America/Los_Angeles
   OCTRI_AUTHENTICATION_BASEURL: https://octriinternal.ohsu.edu
   OCTRI_SANDBOX_DATA_SAMPLE_DIRECTORIES: file:/config/sample_data/setup,file:/config/sample_data/patients
-  OCTRI_SANDBOX_FHIR_BASE_URL: https://octriinternal.ohsu.edu/fhir-sandbox-backend
+  OCTRI_SANDBOX_FHIR_BASE_URL: https://octriinternal.ohsu.edu/fhir-sandbox-backend/fhir
   OCTRI_SANDBOX_OAUTH2_ISSUER_URL: https://octriinternal.ohsu.edu/fhir-sandbox
   OCTRI_SANDBOX_OAUTH2_PRIVATE_KEY_LOCATION: file:/config/oauth/jwks-private-key.pem

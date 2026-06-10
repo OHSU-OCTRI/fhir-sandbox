@@ -66,6 +66,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add ID to checkbox in sandbox form to fix accessibility issue
 - Fix error mounting the launch modal component when a sandbox has no clients (RFS-296)
 - Fix Bootstrap modal import in `LaunchModal` component that broke dropdown menus (RFS-296)
+- Correct FHIR server base URLs in Kubernetes configuration (RFS-256)
+- Increase Kubernetes deployment resources to prevent out of memory errors (RFS-256)
+- Allow cross-origin use of session cookie so that client launch does not redirect to login page (RFS-256)
 
 [unreleased]: https://github.com/OCTRI-Apps/fhir-sandbox/compare/v0.1.0...HEAD
 [0.1.0]: https://source.ohsu.edu/OCTRI-Apps/fhir-sandbox/releases/tag/v0.1.0
