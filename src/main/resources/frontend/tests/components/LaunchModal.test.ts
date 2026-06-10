@@ -16,8 +16,8 @@ const { mockShow, mockHide, mockGetOrCreateInstance, mockLoadApps } = vi.hoisted
   return { mockShow, mockHide, mockGetOrCreateInstance, mockLoadApps };
 });
 
-vi.mock('bootstrap', () => ({
-  Modal: { getOrCreateInstance: mockGetOrCreateInstance },
+vi.mock('bootstrap/js/dist/Modal', () => ({
+  default: { getOrCreateInstance: mockGetOrCreateInstance }
 }));
 
 vi.mock('../../composables/useApps', () => ({

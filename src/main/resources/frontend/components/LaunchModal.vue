@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { Modal } from 'bootstrap';
+import Modal from 'bootstrap/js/dist/Modal';
 
 import PatientSelector from './PatientSelector.vue';
 import PractitionerSelector from './PractitionerSelector.vue';
