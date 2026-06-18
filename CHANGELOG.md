@@ -33,6 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add UI for selecting app launch practitioner and patient. (RFS-249)
 - Added Sandbox sharing between users (RFS-259)
 - Ensure that requests to create partitions and load sample data have a valid bearer token (RFS-293)
+- Configurable token TTL (RFS-301)
+- Enable refresh tokens for public clients (RFS-301)
 
 ### Changed
 
@@ -69,6 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Correct FHIR server base URLs in Kubernetes configuration (RFS-256)
 - Increase Kubernetes deployment resources to prevent out of memory errors (RFS-256)
 - Allow cross-origin use of session cookie so that client launch does not redirect to login page (RFS-256)
+- Ensure that pre-authorized tokens have same format as those from the authorization server (RFS-293)
 
 [unreleased]: https://github.com/OCTRI-Apps/fhir-sandbox/compare/v0.1.0...HEAD
 [0.1.0]: https://source.ohsu.edu/OCTRI-Apps/fhir-sandbox/releases/tag/v0.1.0
