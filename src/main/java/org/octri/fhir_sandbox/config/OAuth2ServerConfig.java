@@ -3,6 +3,7 @@ package org.octri.fhir_sandbox.config;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
+import org.octri.fhir_sandbox.oauth2.customizer.PublicClientAllowingRefreshTokenGenerator;
 import org.octri.fhir_sandbox.oauth2.customizer.SmartLaunchContextTokenResponseCustomizer;
 import org.octri.fhir_sandbox.oauth2.customizer.SmartOnFhirAwareTokenCustomizer;
 import org.octri.fhir_sandbox.service.SandboxService;
@@ -21,8 +22,11 @@ import org.springframework.security.oauth2.server.authorization.OAuth2Authorizat
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AccessTokenAuthenticationContext;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
 import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
+import org.springframework.security.oauth2.server.authorization.token.DelegatingOAuth2TokenGenerator;
 import org.springframework.security.oauth2.server.authorization.token.JwtEncodingContext;
+import org.springframework.security.oauth2.server.authorization.token.JwtGenerator;
 import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenCustomizer;
+import org.springframework.security.oauth2.server.authorization.token.OAuth2TokenGenerator;
 import org.springframework.util.Assert;
 
 import com.nimbusds.jose.jwk.JWK;
@@ -117,17 +121,36 @@ public class OAuth2ServerConfig {
 	}
 
 	/**
-	 * Provides a customizer that adds SMART app <code>fhirUser</code> context to the OIDC ID token.
+	 * Provides a customizer that adds SMART on FHIR context to the OAuth2 access tokens and OIDC ID tokens.
 	 *
 	 * @param smartLaunchContextService
 	 *            service used to look up SMART app launch context information
 	 * @return
 	 */
 	@Bean
-	public OAuth2TokenCustomizer<JwtEncodingContext> idTokenCustomizer(
+	public OAuth2TokenCustomizer<JwtEncodingContext> oauth2TokenCustomizer(
 			SmartLaunchContextService smartLaunchContextService, SmartClientService smartClientService,
 			SandboxService sandboxService) {
 		return new SmartOnFhirAwareTokenCustomizer(sandboxService, smartClientService, smartLaunchContextService);
+	}
+
+	/**
+	 * Provides a custom {@link OAuth2TokenGenerator} that allows refresh tokens for public clients.
+	 * 
+	 * @param jwtEncoder
+	 *            JWT token encoder, as returned by {@link #jwtEncoder(JWKSource)}
+	 * @param tokenCustomizer
+	 *            OAuth2 token customizer, as returned by
+	 *            {@link #oauth2TokenCustomizer(SmartLaunchContextService, SmartClientService, SandboxService)}
+	 * @return
+	 * @see PublicClientAllowingRefreshTokenGenerator
+	 */
+	@Bean
+	public OAuth2TokenGenerator<?> tokenGenerator(JwtEncoder jwtEncoder,
+			OAuth2TokenCustomizer<JwtEncodingContext> tokenCustomizer) {
+		var jwtGenerator = new JwtGenerator(jwtEncoder);
+		jwtGenerator.setJwtCustomizer(tokenCustomizer);
+		return new DelegatingOAuth2TokenGenerator(jwtGenerator, new PublicClientAllowingRefreshTokenGenerator());
 	}
 
 	/**

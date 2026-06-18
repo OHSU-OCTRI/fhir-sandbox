@@ -33,6 +33,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add UI for selecting app launch practitioner and patient. (RFS-249)
 - Added Sandbox sharing between users (RFS-259)
 - Ensure that requests to create partitions and load sample data have a valid bearer token (RFS-293)
+- Configurable token TTL (RFS-301)
+- Enable refresh tokens for public clients (RFS-301)
 
 ### Changed
 

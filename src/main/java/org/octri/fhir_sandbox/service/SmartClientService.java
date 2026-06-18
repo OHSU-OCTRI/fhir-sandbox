@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
+import org.octri.fhir_sandbox.config.OAuth2ServerProperties;
 import org.octri.fhir_sandbox.domain.ClientType;
 import org.octri.fhir_sandbox.domain.SmartClient;
 import org.octri.fhir_sandbox.repository.SmartClientRepository;
@@ -33,10 +34,12 @@ import io.jsonwebtoken.lang.Assert;
 public class SmartClientService implements RegisteredClientRepository {
 
 	private final SmartClientRepository repository;
+	private final OAuth2ServerProperties serverProperties;
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
-	public SmartClientService(SmartClientRepository repository) {
+	public SmartClientService(SmartClientRepository repository, OAuth2ServerProperties serverProperties) {
 		this.repository = repository;
+		this.serverProperties = serverProperties;
 
 		ClassLoader classLoader = SmartClientService.class.getClassLoader();
 		List<Module> securityModules = SecurityJackson2Modules.getModules(classLoader);
@@ -112,12 +115,18 @@ public class SmartClientService implements RegisteredClientRepository {
 	 */
 	private void configurePublicClient(SmartClient client) {
 		client.setClientAuthenticationMethods(ClientAuthenticationMethod.NONE.getValue());
-		client.setAuthorizationGrantTypes(AuthorizationGrantType.AUTHORIZATION_CODE.getValue());
+		var grantTypes = new String[] { AuthorizationGrantType.AUTHORIZATION_CODE.getValue(),
+				AuthorizationGrantType.REFRESH_TOKEN.getValue() };
+		client.setAuthorizationGrantTypes(String.join(" ", grantTypes));
 		var clientSettings = ClientSettings.builder()
 				.requireAuthorizationConsent(true)
 				.requireProofKey(true)
 				.build();
-		var tokenSettings = TokenSettings.builder().build();
+		var tokenSettings = TokenSettings.builder()
+				.accessTokenTimeToLive(serverProperties.getAccessTokenTtl())
+				.refreshTokenTimeToLive(serverProperties.getRefreshTokenTtl())
+				.reuseRefreshTokens(false)
+				.build();
 		client.setClientSettings(writeMap(clientSettings.getSettings()));
 		client.setTokenSettings(writeMap(tokenSettings.getSettings()));
 	}
