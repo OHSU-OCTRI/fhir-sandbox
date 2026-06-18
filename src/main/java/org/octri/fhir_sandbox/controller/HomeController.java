@@ -154,7 +154,8 @@ public class HomeController {
 		ViewUtils.addPageScript(model, "shared-account-selector.js");
 		var accessToken = preAuthorizedTokenService.generateToken(Map.of(
 				"sub", securityHelper.username(),
-				"aud", fhirServerUrl));
+				"aud", fhirServerUrl,
+				"scope", List.of("user/*.cruds")));
 
 		model.put("baseRoute", BASE_ROUTE);
 		model.put("entity", sandbox);

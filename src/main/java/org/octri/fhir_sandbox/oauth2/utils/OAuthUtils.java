@@ -5,6 +5,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
@@ -19,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class OAuthUtils {
 
 	public static final String LAUNCH_PARAMETER_NAME = "launch";
-	public static final Map<String, Object> SYSTEM_CLAIMS = Map.of("sub", "system", "scope", "system/*.*");
+	public static final Map<String, Object> SYSTEM_CLAIMS = Map.of("sub", "system", "scope", List.of("system/*.cruds"));
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
