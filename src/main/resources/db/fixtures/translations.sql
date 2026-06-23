@@ -10,6 +10,7 @@ VALUES
 (0, NOW(), NOW(), 'en-US', 'sandbox.clients.label', 'Clients', 'Label for the section showing the clients associated with a sandbox', 0),
 (0, NOW(), NOW(), 'en-US', 'sandbox.clients.none', 'No clients have been registered for this sandbox.', 'Message to show when a sandbox has no clients', 0),
 (0, NOW(), NOW(), 'en-US', 'sandbox.fhirServerUrl.label', 'FHIR Server URL', 'Label for the sandbox''s FHIR Server URL field', 0),
+(0, NOW(), NOW(), 'en-US', 'sandbox.accessToken.label', 'Current Access Token', 'Label for the sandbox''s current access token', 0),
 (0, NOW(), NOW(), 'en-US', 'sandbox.description.label', 'Description', 'Label for Sandbox description field', 0),
 (0, NOW(), NOW(), 'en-US', 'sandbox.serverPartitionId.label', 'Server partition id', 'Label for Sandbox serverPartitionId field', 0),
 (0, NOW(), NOW(), 'en-US', 'sandbox.serverPartitionName.label', 'Server partition name', 'Label for Sandbox serverPartitionName field', 0),

@@ -35,6 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Ensure that requests to create partitions and load sample data have a valid bearer token (RFS-293)
 - Configurable token TTL (RFS-301)
 - Enable refresh tokens for public clients (RFS-301)
+- Add a copy link to Sandbox Details for an access token that can be used to load data (RFS-303)
+- Add a copy link to the FHIR server url to Sandbox Details (RFS-303)
 
 ### Changed
 

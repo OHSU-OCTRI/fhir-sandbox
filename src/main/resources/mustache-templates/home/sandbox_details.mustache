@@ -16,8 +16,13 @@
 		</p>
 		<h5>{{#i18n}}sandbox.fhirServerUrl.label{{/i18n}}</h5>
 		<p>
-			{{#fhirServerUrl}}{{.}}{{/fhirServerUrl}}
+			{{#fhirServerUrl}}{{.}}{{>components/copy_field}}{{/fhirServerUrl}}
 			{{^fhirServerUrl}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/fhirServerUrl}}
+		</p>
+		<h5>{{#i18n}}sandbox.accessToken.label{{/i18n}}</h5>
+		<p>
+			{{#accessToken}}{{>components/copy_field}}{{/accessToken}}
+			{{^accessToken}}<span class="text-muted">{{#i18n}}system.entity.none{{/i18n}}</span>{{/accessToken}}
 		</p>
 		{{>components/show_links}}
 		{{/entity}}
