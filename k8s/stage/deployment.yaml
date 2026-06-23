@@ -43,8 +43,8 @@ spec:
             memory: 1Gi
             cpu: 250m
           limits:
-            memory: 2Gi
-            cpu: 1000m
+            memory: 4Gi
+            cpu: 2000m
         ports:
         - containerPort: 8080
         envFrom:
@@ -55,9 +55,9 @@ spec:
         - secretRef:
             name: ldap-env
         volumeMounts:
-        - name: data-safe-nfs
+        - name: octrikube-nfs
           mountPath: /config/sample_data
-          subPath: fhir-sandbox/synthea_data
+          subPath: fhir-sandbox-data/synthea_data
           readOnly: true
         - name: mysql-pki
           mountPath: /etc/pki/mysql
@@ -66,9 +66,9 @@ spec:
           mountPath: /config/oauth
           radOnly: true
       volumes:
-      - name: data-safe-nfs
+      - name: octrikube-nfs
         persistentVolumeClaim:
-          claimName: data-safe-nfs
+          claimName: octrikube-nfs
       - name: mysql-pki
         secret:
           secretName: stage-mysql-truststore
