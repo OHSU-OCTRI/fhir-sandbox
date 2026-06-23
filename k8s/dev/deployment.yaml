@@ -57,7 +57,7 @@ spec:
         volumeMounts:
         - name: octrikube-nfs
           mountPath: /config/sample_data
-          subPath: fhir-sandbox-dev/synthea_data
+          subPath: fhir-sandbox-data/synthea_data
           readOnly: true
         - name: mysql-pki
           mountPath: /etc/pki/mysql
