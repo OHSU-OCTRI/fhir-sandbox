@@ -13,7 +13,7 @@ on:
 jobs:
   build-java-source:
     name: Build jar and test
-    uses: OHSU-OCTRI/shared-workflows/.github/workflows/java-build.yaml@main
+    uses: OHSU-OCTRI/shared-workflows/.github/workflows/java-test-build.yaml@main
     with:
       java_version: '17'
     # Does not inherit secrets due to security changes in automated workflows
