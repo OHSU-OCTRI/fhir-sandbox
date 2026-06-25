@@ -61,6 +61,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add GitHub Actions workflow to build container image. (RFS-256)
 - Add initial Kubernetes deployment manifests. (RFS-256)
 - Update manifests for initial prod deployment. (RFS-297)
+- Create a test build workflow to handle PRs (CIS-3773)
 
 ### Fixed
 
