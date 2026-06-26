@@ -1,0 +1,14 @@
+{{>layout/header}}
+<div class="container">
+	<h1>Launch SMART Application</h1>
+	<p class="text-muted">Select a patient and practitioner to include as launch context.</p>
+
+	<div
+		id="standalone-launcher-app"
+		data-fhir-api="{{fhirApi}}"
+		data-access-token="{{accessToken}}"
+		data-client-id="{{clientId}}"
+		data-session-key="{{sessionKey}}">
+	</div>
+</div>
+{{>layout/footer}}
