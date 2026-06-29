@@ -1,21 +1,18 @@
 package org.octri.fhir_sandbox.controller;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import org.octri.authentication.server.security.SecurityHelper;
 import org.octri.authentication.server.security.service.UserService;
 import org.octri.common.view.ViewUtils;
 import org.octri.fhir_sandbox.domain.SmartLaunchContextProperties;
+import org.octri.fhir_sandbox.exception.DisplayedException;
 import org.octri.fhir_sandbox.filter.StandaloneLaunchFilter;
-import org.octri.fhir_sandbox.service.PreAuthorizedTokenService;
-import org.octri.fhir_sandbox.service.SandboxService;
-import org.octri.fhir_sandbox.service.SmartClientService;
 import org.octri.fhir_sandbox.service.SmartLaunchContextService;
+import org.octri.fhir_sandbox.service.StandaloneLaunchService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +24,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 /**
@@ -42,23 +38,17 @@ import jakarta.servlet.http.HttpSession;
  */
 @RestController
 @RequestMapping("/smart/standalone-launch")
-@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPER')")
 public class StandaloneLaunchController {
 
     private final UserService userService;
-    private final SandboxService sandboxService;
-    private final SmartClientService clientService;
     private final SmartLaunchContextService launchContextService;
-    private final PreAuthorizedTokenService preAuthorizedTokenService;
+    private final StandaloneLaunchService standaloneLaunchService;
 
-    public StandaloneLaunchController(UserService userService, SandboxService sandboxService,
-            SmartClientService clientService, SmartLaunchContextService launchContextService,
-            PreAuthorizedTokenService preAuthorizedTokenService) {
+    public StandaloneLaunchController(UserService userService, SmartLaunchContextService launchContextService,
+            StandaloneLaunchService standaloneLaunchService) {
         this.userService = userService;
-        this.sandboxService = sandboxService;
-        this.clientService = clientService;
         this.launchContextService = launchContextService;
-        this.preAuthorizedTokenService = preAuthorizedTokenService;
+        this.standaloneLaunchService = standaloneLaunchService;
     }
 
     public record CompleteRequest(String key, String clientId, String patientId, String fhirUser) {
@@ -67,52 +57,30 @@ public class StandaloneLaunchController {
     /**
      * Renders the patient/practitioner picker for a standalone launch.
      * <p>
-     * Retrieves the saved OAuth2 parameters from the session (stored by
-     * {@link StandaloneLaunchFilter}), validates that the authenticated user has access to the
-     * sandbox associated with the requesting SMART client, then renders the picker page.
+     * Retrieves the saved OAuth2 parameters from the session (stored by {@link StandaloneLaunchFilter}),
+     * then delegates to {@link StandaloneLaunchService} to validate access and build the picker data.
      */
     @GetMapping
-    public ModelAndView picker(@RequestParam String key, Map<String, Object> model,
-            HttpSession session, HttpServletResponse response) throws IOException {
-
+    public ModelAndView picker(@RequestParam String key, Map<String, Object> model, HttpSession session) {
         var params = sessionParams(key, session);
         if (params == null) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid or expired launch session");
-            return null;
+            throw new DisplayedException(HttpStatus.BAD_REQUEST, "Invalid or expired launch session");
         }
 
         var clientIdValues = params.get("client_id");
         if (clientIdValues == null || clientIdValues.length == 0) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing client_id in launch session");
-            return null;
+            throw new DisplayedException(HttpStatus.BAD_REQUEST, "Missing client_id in launch session");
         }
 
-        var optClient = clientService.findSmartClientByClientId(clientIdValues[0]);
-        if (optClient.isEmpty()) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, "SMART client not found");
-            return null;
-        }
-
-        var client = optClient.get();
-        var sandbox = client.getSandbox();
         var securityHelper = new SecurityHelper(SecurityContextHolder.getContext());
         var currentUser = userService.findByUsername(securityHelper.username());
-
-        if (!sandboxService.getSandboxesForUser(currentUser).contains(sandbox)) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "You do not have access to this sandbox");
-            return null;
-        }
-
-        var fhirServerUrl = sandboxService.getSandboxFhirUrl(sandbox);
-        var accessToken = preAuthorizedTokenService.generateToken(Map.of(
-                "sub", securityHelper.username(),
-                "aud", fhirServerUrl,
-                "scope", List.of("user/*.cruds")));
+        var pickerData = standaloneLaunchService.validateAndGetPickerData(
+                clientIdValues[0], currentUser, securityHelper.username());
 
         model.put("sessionKey", key);
-        model.put("clientId", client.getClientId());
-        model.put("fhirApi", fhirServerUrl);
-        model.put("accessToken", accessToken);
+        model.put("clientId", pickerData.client().getClientId());
+        model.put("fhirApi", pickerData.fhirServerUrl());
+        model.put("accessToken", pickerData.accessToken());
 
         ViewUtils.addPageScript(model, "standalone-launch.ts");
 

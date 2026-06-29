@@ -69,10 +69,7 @@ const onLaunch = async () => {
         :selected-practitioner="selectedPractitioner"
         @practitioner-selected="selectedPractitioner = $event"
       />
-      <div class="d-flex justify-content-end mt-3 gap-2">
-        <button type="button" class="btn btn-outline-secondary" @click="showPatientSelector = true">
-          Skip
-        </button>
+      <div class="d-flex justify-content-end mt-3">
         <button
           type="button"
           class="btn btn-primary"
