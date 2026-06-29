@@ -26,7 +26,7 @@ const errorMessage = ref<string | null>(null);
 const launching = ref(false);
 
 const onLaunch = async () => {
-  if (!selectedPatient.value || launching.value) return;
+  if (!selectedPatient.value || !selectedPractitioner.value || launching.value) return;
 
   launching.value = true;
   errorMessage.value = null;
@@ -37,10 +37,10 @@ const onLaunch = async () => {
     patientId: selectedPatient.value.resource.id,
     fhirUser: selectedPractitioner.value
       ? getPersonId(selectedPractitioner.value.resource)
-      : undefined,
+      : undefined
   };
 
-  const result = await api.post<{ authorizeUrl?: string; error?: string }>(
+  const result = await api.post<{ authorizeUrl?: string }>(
     props.completeUrl,
     csrfTokenHeader(props.csrfToken),
     body,
@@ -50,7 +50,7 @@ const onLaunch = async () => {
   if (result?.authorizeUrl) {
     window.location.href = result.authorizeUrl;
   } else {
-    errorMessage.value = result?.error ?? 'An error occurred during launch. Please try again.';
+    errorMessage.value = 'An error occurred during launch. Please try again.';
     launching.value = false;
   }
 };
@@ -89,7 +89,11 @@ const onLaunch = async () => {
         @patient-selected="selectedPatient = $event"
       />
       <div class="d-flex justify-content-end mt-3 gap-2">
-        <button type="button" class="btn btn-outline-secondary" @click="showPatientSelector = false">
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          @click="showPatientSelector = false"
+        >
           Back
         </button>
         <button

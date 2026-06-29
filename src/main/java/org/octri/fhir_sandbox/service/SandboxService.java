@@ -69,11 +69,8 @@ public class SandboxService {
 		return repository.findById(id);
 	}
 
-
 	/**
-	 * Finds all sandboxes owned by the given user.
-	 *
-	 * TODO: Include sandboxes shared with the user, once sharing is implemented.
+	 * Finds all sandboxes owned or shared with the given user.
 	 *
 	 * @param user
 	 * @return

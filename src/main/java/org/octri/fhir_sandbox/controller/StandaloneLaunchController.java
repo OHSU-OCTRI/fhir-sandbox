@@ -21,106 +21,104 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
 /**
- * Handles the standalone SMART on FHIR launch flow.
- * <p>
- * When a SMART app initiates a standalone launch it calls {@code /oauth2/authorize} without a
- * {@code launch} parameter. {@link StandaloneLaunchFilter} intercepts that request, stores the
- * original OAuth2 parameters in the session, and redirects here so the user can select patient
- * and practitioner context. Once context is selected, {@link #complete} creates a launch context
- * and sends the browser back to {@code /oauth2/authorize} with the original parameters plus the
+ * Handles the standalone SMART on FHIR launch flow. When a SMART app initiates a standalone launch it calls
+ * the authorization endpoint without a {@code launch} parameter. {@link StandaloneLaunchFilter} intercepts
+ * that request, stores the original OAuth2 parameters in the session, and redirects here so the user can select
+ * patient and practitioner context. Once context is selected, {@link #complete} creates a launch context
+ * and sends the browser back to the authorization endpoint with the original parameters plus the
  * new {@code launch} value, resuming the normal authorization flow.
  */
 @RestController
 @RequestMapping("/smart/standalone-launch")
 public class StandaloneLaunchController {
 
-    private final UserService userService;
-    private final SmartLaunchContextService launchContextService;
-    private final StandaloneLaunchService standaloneLaunchService;
+	private final UserService userService;
+	private final SmartLaunchContextService launchContextService;
+	private final StandaloneLaunchService standaloneLaunchService;
 
-    public StandaloneLaunchController(UserService userService, SmartLaunchContextService launchContextService,
-            StandaloneLaunchService standaloneLaunchService) {
-        this.userService = userService;
-        this.launchContextService = launchContextService;
-        this.standaloneLaunchService = standaloneLaunchService;
-    }
+	public StandaloneLaunchController(UserService userService, SmartLaunchContextService launchContextService,
+			StandaloneLaunchService standaloneLaunchService) {
+		this.userService = userService;
+		this.launchContextService = launchContextService;
+		this.standaloneLaunchService = standaloneLaunchService;
+	}
 
-    public record CompleteRequest(String key, String clientId, String patientId, String fhirUser) {
-    }
+	public record CompleteRequest(String key, String clientId, String patientId, String fhirUser) {
+	}
 
-    /**
-     * Renders the patient/practitioner picker for a standalone launch.
-     * <p>
-     * Retrieves the saved OAuth2 parameters from the session (stored by {@link StandaloneLaunchFilter}),
-     * then delegates to {@link StandaloneLaunchService} to validate access and build the picker data.
-     */
-    @GetMapping
-    public ModelAndView picker(@RequestParam String key, Map<String, Object> model, HttpSession session) {
-        var params = sessionParams(key, session);
-        if (params == null) {
-            throw new DisplayedException(HttpStatus.BAD_REQUEST, "Invalid or expired launch session");
-        }
+	/**
+	 * Renders the patient/practitioner picker for a standalone launch. Retrieves the saved OAuth2 parameters from the
+	 * session then delegates to {@link StandaloneLaunchService} to validate access and build the picker data.
+	 */
+	@GetMapping
+	public ModelAndView picker(@RequestParam String key, Map<String, Object> model, HttpSession session) {
+		var params = sessionParams(key, session);
+		if (params == null) {
+			throw new DisplayedException(HttpStatus.BAD_REQUEST, "Invalid or expired launch session");
+		}
 
-        var clientIdValues = params.get("client_id");
-        if (clientIdValues == null || clientIdValues.length == 0) {
-            throw new DisplayedException(HttpStatus.BAD_REQUEST, "Missing client_id in launch session");
-        }
+		var clientIdValues = params.get("client_id");
+		if (clientIdValues == null || clientIdValues.length == 0) {
+			throw new DisplayedException(HttpStatus.BAD_REQUEST, "Missing client_id in launch session");
+		}
 
-        var securityHelper = new SecurityHelper(SecurityContextHolder.getContext());
-        var currentUser = userService.findByUsername(securityHelper.username());
-        var pickerData = standaloneLaunchService.validateAndGetPickerData(
-                clientIdValues[0], currentUser, securityHelper.username());
+		var currentUser = userService.findByUsername(
+				new SecurityHelper(SecurityContextHolder.getContext()).username());
+		var pickerData = standaloneLaunchService.validateAndGetPickerData(clientIdValues[0], currentUser);
 
-        model.put("sessionKey", key);
-        model.put("clientId", pickerData.client().getClientId());
-        model.put("fhirApi", pickerData.fhirServerUrl());
-        model.put("accessToken", pickerData.accessToken());
+		model.put("sessionKey", key);
+		model.put("clientId", pickerData.client().getClientId());
+		model.put("fhirApi", pickerData.fhirServerUrl());
+		model.put("accessToken", pickerData.accessToken());
 
-        ViewUtils.addPageScript(model, "standalone-launch.ts");
+		ViewUtils.addPageScript(model, "standalone-launch.ts");
 
-        return new ModelAndView("standalone_launch/picker", model);
-    }
+		return new ModelAndView("standalone_launch/picker", model);
+	}
 
-    /**
-     * Creates the launch context from the user's selection and redirects back to the OAuth2
-     * authorization endpoint with the original parameters plus the new {@code launch} value.
-     */
-    @PostMapping(value = "/complete", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> complete(@RequestBody CompleteRequest payload,
-            HttpSession session, HttpServletRequest request) {
+	/**
+	 * Creates the launch context from the user's selection and redirects back to the OAuth2
+	 * authorization endpoint with the original parameters plus the new {@code launch} value.
+	 * 
+	 * @param payload
+	 * @param session
+	 * @param request
+	 * @return
+	 */
+	@PostMapping(value = "/complete", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Map<String, Object>> complete(@RequestBody CompleteRequest payload,
+			HttpSession session, HttpServletRequest request) {
 
-        var params = sessionParams(payload.key(), session);
-        if (params == null) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Invalid or expired launch session"));
-        }
+		var params = sessionParams(payload.key(), session);
+		if (params == null) {
+			return ResponseEntity.badRequest().body(Map.of("error", "Invalid or expired launch session"));
+		}
 
-        if (payload.clientId() == null || (payload.patientId() == null && payload.fhirUser() == null)) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "clientId and at least one of patientId or fhirUser are required"));
-        }
+		if (payload.clientId() == null || payload.patientId() == null) {
+			return ResponseEntity.badRequest()
+					.body(Map.of("error", "clientId and patientId are required"));
+		}
 
-        var contextProps = new SmartLaunchContextProperties(
-                payload.clientId(), payload.patientId(), null, payload.fhirUser());
-        var context = launchContextService.createLaunchContext(contextProps);
+		var contextProps = new SmartLaunchContextProperties(
+				payload.clientId(), payload.patientId(), null, payload.fhirUser());
+		var context = launchContextService.createLaunchContext(contextProps);
 
-        session.removeAttribute(StandaloneLaunchFilter.SESSION_KEY_PREFIX + payload.key());
+		session.removeAttribute(StandaloneLaunchFilter.SESSION_KEY_PREFIX + payload.key());
 
-        var uriBuilder = UriComponentsBuilder.fromPath(request.getContextPath() + "/oauth2/authorize");
-        params.forEach((k, v) -> uriBuilder.queryParam(k, (Object[]) v));
-        uriBuilder.queryParam("launch", context.getOpaqueId());
+		var authorizeUrl = standaloneLaunchService.buildAuthorizeUrl(
+				request.getContextPath(), params, context.getOpaqueId());
 
-        return ResponseEntity.ok(Map.of("authorizeUrl", uriBuilder.build().toUriString()));
-    }
+		return ResponseEntity.ok(Map.of("authorizeUrl", authorizeUrl));
+	}
 
-    @SuppressWarnings("unchecked")
-    private Map<String, String[]> sessionParams(String key, HttpSession session) {
-        return (Map<String, String[]>) session.getAttribute(StandaloneLaunchFilter.SESSION_KEY_PREFIX + key);
-    }
+	@SuppressWarnings("unchecked")
+	private Map<String, String[]> sessionParams(String key, HttpSession session) {
+		return (Map<String, String[]>) session.getAttribute(StandaloneLaunchFilter.SESSION_KEY_PREFIX + key);
+	}
 
 }

@@ -19,6 +19,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AccessTokenAuthenticationContext;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2AccessTokenResponseAuthenticationSuccessHandler;
 import org.springframework.security.web.SecurityFilterChain;
@@ -41,12 +42,15 @@ public class SecurityConfiguration {
 	private final AuthenticationRouteProperties routes;
 	private final DefaultSecurityConfigurer securityConfigurer;
 	private final Consumer<OAuth2AccessTokenAuthenticationContext> tokenResponseCustomizer;
+	private final AuthorizationServerSettings authorizationServerSettings;
 
 	public SecurityConfiguration(AuthenticationRouteProperties routes, DefaultSecurityConfigurer securityConfigurer,
-			Consumer<OAuth2AccessTokenAuthenticationContext> tokenResponseCustomizer) {
+			Consumer<OAuth2AccessTokenAuthenticationContext> tokenResponseCustomizer,
+			AuthorizationServerSettings authorizationServerSettings) {
 		this.routes = routes;
 		this.securityConfigurer = securityConfigurer;
 		this.tokenResponseCustomizer = tokenResponseCustomizer;
+		this.authorizationServerSettings = authorizationServerSettings;
 	}
 
 	/**
@@ -77,7 +81,7 @@ public class SecurityConfiguration {
 								new LoginUrlAuthenticationEntryPoint("/login"),
 								new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
 				.cors(withDefaults())
-				.addFilterAfter(new StandaloneLaunchFilter(), SecurityContextHolderFilter.class);
+				.addFilterAfter(new StandaloneLaunchFilter(authorizationServerSettings), SecurityContextHolderFilter.class);
 
 		return http.build();
 

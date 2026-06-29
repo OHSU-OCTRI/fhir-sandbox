@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Enable refresh tokens for public clients (RFS-301)
 - Add a copy link to Sandbox Details for an access token that can be used to load data (RFS-303)
 - Add a copy link to the FHIR server url to Sandbox Details (RFS-303)
+- Add support for standalone launch (RFS-307)
 
 ### Changed
 

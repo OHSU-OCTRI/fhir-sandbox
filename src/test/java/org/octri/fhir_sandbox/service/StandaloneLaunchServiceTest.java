@@ -2,6 +2,7 @@ package org.octri.fhir_sandbox.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.when;
 
@@ -21,6 +22,7 @@ import org.octri.fhir_sandbox.domain.Sandbox;
 import org.octri.fhir_sandbox.domain.SmartClient;
 import org.octri.fhir_sandbox.exception.DisplayedException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 
 @ExtendWith(MockitoExtension.class)
 public class StandaloneLaunchServiceTest {
@@ -36,6 +38,8 @@ public class StandaloneLaunchServiceTest {
 	private SandboxService sandboxService;
 	@Mock
 	private PreAuthorizedTokenService preAuthorizedTokenService;
+	@Mock
+	private AuthorizationServerSettings authorizationServerSettings;
 
 	@Mock
 	private User currentUser;
@@ -55,7 +59,7 @@ public class StandaloneLaunchServiceTest {
 		when(clientService.findSmartClientByClientId(CLIENT_ID)).thenReturn(Optional.empty());
 
 		var ex = assertThrows(DisplayedException.class,
-				() -> service.validateAndGetPickerData(CLIENT_ID, currentUser, USERNAME));
+				() -> service.validateAndGetPickerData(CLIENT_ID, currentUser));
 
 		assertEquals(HttpStatus.NOT_FOUND, ex.getHttpStatus());
 	}
@@ -67,7 +71,7 @@ public class StandaloneLaunchServiceTest {
 		when(sandboxService.getSandboxesForUser(currentUser)).thenReturn(List.of());
 
 		var ex = assertThrows(DisplayedException.class,
-				() -> service.validateAndGetPickerData(CLIENT_ID, currentUser, USERNAME));
+				() -> service.validateAndGetPickerData(CLIENT_ID, currentUser));
 
 		assertEquals(HttpStatus.FORBIDDEN, ex.getHttpStatus());
 	}
@@ -76,11 +80,12 @@ public class StandaloneLaunchServiceTest {
 	public void testSuccessReturnsPickerData() {
 		when(clientService.findSmartClientByClientId(CLIENT_ID)).thenReturn(Optional.of(client));
 		when(client.getSandbox()).thenReturn(sandbox);
+		when(currentUser.getUsername()).thenReturn(USERNAME);
 		when(sandboxService.getSandboxesForUser(currentUser)).thenReturn(List.of(sandbox));
 		when(sandboxService.getSandboxFhirUrl(sandbox)).thenReturn(FHIR_URL);
 		when(preAuthorizedTokenService.generateToken(anyMap())).thenReturn(ACCESS_TOKEN);
 
-		var result = service.validateAndGetPickerData(CLIENT_ID, currentUser, USERNAME);
+		var result = service.validateAndGetPickerData(CLIENT_ID, currentUser);
 
 		assertEquals(client, result.client());
 		assertEquals(FHIR_URL, result.fhirServerUrl());
@@ -88,14 +93,31 @@ public class StandaloneLaunchServiceTest {
 	}
 
 	@Test
+	public void testBuildAuthorizeUrlIncludesOriginalParamsAndLaunch() {
+		when(authorizationServerSettings.getAuthorizationEndpoint()).thenReturn("/oauth2/authorize");
+		var sessionParams = Map.of(
+				"client_id", new String[] { CLIENT_ID },
+				"response_type", new String[] { "code" },
+				"redirect_uri", new String[] { "http://localhost/callback" });
+
+		var url = service.buildAuthorizeUrl("/fhir-sandbox", sessionParams, "launch-opaque-id");
+
+		assertTrue(url.startsWith("/fhir-sandbox/oauth2/authorize"));
+		assertTrue(url.contains("client_id=" + CLIENT_ID));
+		assertTrue(url.contains("response_type=code"));
+		assertTrue(url.contains("launch=launch-opaque-id"));
+	}
+
+	@Test
 	public void testSuccessTokenClaimsAreCorrect() {
 		when(clientService.findSmartClientByClientId(CLIENT_ID)).thenReturn(Optional.of(client));
 		when(client.getSandbox()).thenReturn(sandbox);
+		when(currentUser.getUsername()).thenReturn(USERNAME);
 		when(sandboxService.getSandboxesForUser(currentUser)).thenReturn(List.of(sandbox));
 		when(sandboxService.getSandboxFhirUrl(sandbox)).thenReturn(FHIR_URL);
 		when(preAuthorizedTokenService.generateToken(claimsCaptor.capture())).thenReturn(ACCESS_TOKEN);
 
-		service.validateAndGetPickerData(CLIENT_ID, currentUser, USERNAME);
+		service.validateAndGetPickerData(CLIENT_ID, currentUser);
 
 		var claims = claimsCaptor.getValue();
 		assertEquals(USERNAME, claims.get("sub"));
