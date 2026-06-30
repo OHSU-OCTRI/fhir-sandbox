@@ -70,6 +70,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bump `org.octri.common:common_lib` from 2.0.2-SNAPSHOT to 2.1.0 ([#40](https://github.com/OHSU-OCTRI/fhir-sandbox/pull/40))
 - Bump `org.springframework.boot:spring-boot-starter-parent` from 3.5.14 to 3.5.15 ([#49](https://github.com/OHSU-OCTRI/fhir-sandbox/pull/49))
 - Run `npm audit fix`
+- Bump `org.springframework.boot:spring-boot-starter-parent` from 3.5.15 to 3.5.16
+- Bump `org.octri.common:common_lib` from 2.1.0 to 2.1.1
+- Bump `com.github.ben-manes.caffeine:caffeine` from 3.1.8 to 3.2.4
 
 ### Fixed
 
