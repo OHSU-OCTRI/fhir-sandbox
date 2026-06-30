@@ -15,7 +15,7 @@ spec:
         app: fhir-sandbox-prod
       annotations:
         co.elastic.logs/multiline.type: pattern
-        co.elastic.logs/multiline.pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+        co.elastic.logs/multiline.pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}
         co.elastic.logs/multiline.negate: 'true'
         co.elastic.logs/multiline.match: after
         co.elastic.logs/processors.dissect.tokenizer: '%{+@timestamp} %{log.level} %{process.pid|long} --- [%{process.thread.name}] %{log.logger} : %{}'
@@ -33,51 +33,51 @@ spec:
         runAsGroup: 5333
         fsGroup: 5333
       containers:
-      - name: fhir-sandbox
-        image: ghcr.io/ohsu-octri/fhir-sandbox:latest
-        imagePullPolicy: Always
-        securityContext:
-          allowPrivilegeEscalation: false
-        resources:
-          requests:
-            memory: 1Gi
-            cpu: 250m
-          limits:
-            memory: 4Gi
-            cpu: 2000m
-        ports:
-        - containerPort: 8080
-        envFrom:
-        - configMapRef:
-            name: fhir-sandbox-prod
-        - secretRef:
-            name: fhir-sandbox-prod
-        - secretRef:
-            name: ldap-env
-        volumeMounts:
-        - name: octrikube-nfs
-          mountPath: /config/sample_data
-          subPath: fhir-sandbox-data/synthea_data
-          readOnly: true
-        - name: mysql-pki
-          mountPath: /etc/pki/mysql
-          readOnly: true
-        - name: oauth-pki
-          mountPath: /config/oauth
-          readOnly: true
+        - name: fhir-sandbox
+          image: ghcr.io/ohsu-octri/fhir-sandbox:0.1.0
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+          resources:
+            requests:
+              memory: 1Gi
+              cpu: 250m
+            limits:
+              memory: 4Gi
+              cpu: 2000m
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: fhir-sandbox-prod
+            - secretRef:
+                name: fhir-sandbox-prod
+            - secretRef:
+                name: ldap-env
+          volumeMounts:
+            - name: octrikube-nfs
+              mountPath: /config/sample_data
+              subPath: fhir-sandbox-data/synthea_data
+              readOnly: true
+            - name: mysql-pki
+              mountPath: /etc/pki/mysql
+              readOnly: true
+            - name: oauth-pki
+              mountPath: /config/oauth
+              readOnly: true
       volumes:
-      - name: octrikube-nfs
-        persistentVolumeClaim:
-          claimName: octrikube-nfs
-      - name: mysql-pki
-        secret:
-          secretName: prod-mysql-truststore
-      - name: oauth-pki
-        secret:
-          secretName: fhir-sandbox-prod
-          defaultMode: 0440
-          items:
-          - key: jwks-private-key.pem
-            path: jwks-private-key.pem
+        - name: octrikube-nfs
+          persistentVolumeClaim:
+            claimName: octrikube-nfs
+        - name: mysql-pki
+          secret:
+            secretName: prod-mysql-truststore
+        - name: oauth-pki
+          secret:
+            secretName: fhir-sandbox-prod
+            defaultMode: 440
+            items:
+              - key: jwks-private-key.pem
+                path: jwks-private-key.pem
       imagePullSecrets:
-      - name: ghcr-registry-cred
+        - name: ghcr-registry-cred
