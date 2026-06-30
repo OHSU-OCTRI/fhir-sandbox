@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-06-30
+
 ### Added
 
 - Add initial application scaffolding
@@ -65,6 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Create a test build workflow to handle PRs (CIS-3773)
 
 ### Dependencies
+
 - Bump `org.octri.common:common_lib` from 2.0.2-SNAPSHOT to 2.1.0 ([#40](https://github.com/OHSU-OCTRI/fhir-sandbox/pull/40))
 - Bump `authlib.version` from 4.0.0 to 4.2.0 ([#39](https://github.com/OHSU-OCTRI/fhir-sandbox/pull/39))
 - Bump `org.octri.common:common_lib` from 2.0.2-SNAPSHOT to 2.1.0 ([#40](https://github.com/OHSU-OCTRI/fhir-sandbox/pull/40))
@@ -87,3 +90,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Increase Kubernetes deployment resources to prevent out of memory errors (RFS-256)
 - Allow cross-origin use of session cookie so that client launch does not redirect to login page (RFS-256)
 - Ensure that pre-authorized tokens have same format as those from the authorization server (RFS-293)
+
+[unreleased]: https://github.com/OHSU-OCTRI/fhir-sandbox/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/OHSU-OCTRI/fhir-sandbox/compare/c961153e520e35192c49b6d394b7526b758cf0be...v0.1.0
