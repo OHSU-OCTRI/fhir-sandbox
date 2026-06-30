@@ -13,7 +13,8 @@ export default defineConfig({
       input: [
         'src/main/resources/frontend/launch-modal.ts',
         'src/main/resources/frontend/managed-content.js',
-        'src/main/resources/frontend/shared-account-selector.js'
+        'src/main/resources/frontend/shared-account-selector.js',
+        'src/main/resources/frontend/standalone-launch.ts'
       ],
       output: {
         entryFileNames: 'assets/js/[name]-[hash].js',

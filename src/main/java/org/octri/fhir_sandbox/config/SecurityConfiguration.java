@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 
 import org.octri.authentication.DefaultSecurityConfigurer;
 import org.octri.authentication.config.AuthenticationRouteProperties;
+import org.octri.fhir_sandbox.filter.StandaloneLaunchFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -18,10 +19,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.server.authorization.authentication.OAuth2AccessTokenAuthenticationContext;
+import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.oauth2.server.authorization.web.authentication.OAuth2AccessTokenResponseAuthenticationSuccessHandler;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.util.matcher.MediaTypeRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -39,12 +42,15 @@ public class SecurityConfiguration {
 	private final AuthenticationRouteProperties routes;
 	private final DefaultSecurityConfigurer securityConfigurer;
 	private final Consumer<OAuth2AccessTokenAuthenticationContext> tokenResponseCustomizer;
+	private final AuthorizationServerSettings authorizationServerSettings;
 
 	public SecurityConfiguration(AuthenticationRouteProperties routes, DefaultSecurityConfigurer securityConfigurer,
-			Consumer<OAuth2AccessTokenAuthenticationContext> tokenResponseCustomizer) {
+			Consumer<OAuth2AccessTokenAuthenticationContext> tokenResponseCustomizer,
+			AuthorizationServerSettings authorizationServerSettings) {
 		this.routes = routes;
 		this.securityConfigurer = securityConfigurer;
 		this.tokenResponseCustomizer = tokenResponseCustomizer;
+		this.authorizationServerSettings = authorizationServerSettings;
 	}
 
 	/**
@@ -74,7 +80,8 @@ public class SecurityConfiguration {
 						.defaultAuthenticationEntryPointFor(
 								new LoginUrlAuthenticationEntryPoint("/login"),
 								new MediaTypeRequestMatcher(MediaType.TEXT_HTML)))
-				.cors(withDefaults());
+				.cors(withDefaults())
+				.addFilterAfter(new StandaloneLaunchFilter(authorizationServerSettings), SecurityContextHolderFilter.class);
 
 		return http.build();
 

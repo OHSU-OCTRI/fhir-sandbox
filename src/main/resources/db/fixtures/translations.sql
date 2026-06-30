@@ -47,6 +47,8 @@ VALUES
 (0, NOW(), NOW(), 'en-US', 'smartClient.scopes.help', 'Space-separated list of scopes', 'Help text for SmartClient scopes field', 0),
 (0, NOW(), NOW(), 'en-US', 'smartClient.scopes.validationMessage', 'Value must be present and at most 2000 characters', 'Validation message for SmartClient scopes field', 0),
 (0, NOW(), NOW(), 'en-US', 'smartClient.tokenSettings.label', 'Token settings', 'Label for SmartClient tokenSettings field', 0),
+(0, NOW(), NOW(), 'en-US', 'standaloneLauncher.title', 'Launch SMART Application', 'Title for standalone launch patient and practitioner selection', 0),
+(0, NOW(), NOW(), 'en-US', 'standaloneLauncher.instructions', 'Select a patient and practitioner to include as launch context.', 'Help text for standalone launch patient and practitioner selection', 0),
 (0, NOW(), NOW(), 'en-US', 'system.entity.actions', 'Actions', 'System value to indicate entity actions', 0),
 (0, NOW(), NOW(), 'en-US', 'system.entity.list', 'List', 'Control/navigation to entity list view', 0),
 (0, NOW(), NOW(), 'en-US', 'system.entity.new', 'New', 'Control/navigation for creating a New entity', 0),
