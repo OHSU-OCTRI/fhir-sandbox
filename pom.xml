@@ -52,7 +52,7 @@
 		<caffeine.version>3.2.4</caffeine.version>
 		<!-- Override version for MySQL 8.4 support -->
 		<flyway.version>11.15.0</flyway.version>
-		<hapifhir.version>8.8.1</hapifhir.version>
+		<hapifhir.version>8.10.1</hapifhir.version>
 	</properties>
 
 	<distributionManagement>
