@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-###
+### Added
 
 - New actions workflow to update Node.js dependencies on a schedule (CIS-3820)
 
