@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Dependencies
 
 - Bump `com.github.eirslett:frontend-maven-plugin` from 1.15.1 to 2.0.1 ([#13](https://github.com/OHSU-OCTRI/fhir-sandbox/pull/13))
+- Run `npm audit fix` to resolve Node.js vulnerabilities (CIS-3824)
 
 ## [0.1.0] - 2026-06-30
 
