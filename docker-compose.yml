@@ -1,6 +1,6 @@
 # Base configuration
-# Keys without a value are passed into the config via a .env file in the same
-# directory as the `docker-compose` command was run from
+# Keys without a value are passed into the config via a .env file in the repository's
+# root directory.
 services:
   app:
     image: ghcr.io/ohsu-octri/fhir-sandbox

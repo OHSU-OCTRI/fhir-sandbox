@@ -11,10 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - New actions workflow to update Node.js dependencies on a schedule (CIS-3820)
 
+### Changed
+
+- Update README.md and RUNNING.md to remove OHSU-specific configuration and clarify setup for new users. (RFS-321)
+
 ### Dependencies
 
 - Bump `com.github.eirslett:frontend-maven-plugin` from 1.15.1 to 2.0.1 ([#13](https://github.com/OHSU-OCTRI/fhir-sandbox/pull/13))
 - Run `npm audit fix` to resolve Node.js vulnerabilities (CIS-3824)
+
+### Removed
+
+- Remove OHSU-specific deployment files. (RFS-321)
 
 ## [0.1.0] - 2026-06-30
 
