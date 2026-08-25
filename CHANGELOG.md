@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - New actions workflow to update Node.js dependencies on a schedule (CIS-3820)
+- Add LICENSE file and license information in pom.xml (RFS-321)
 
 ### Changed
 
