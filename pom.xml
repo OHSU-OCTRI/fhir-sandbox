@@ -18,13 +18,12 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
-	<!-- TODO: Add a LICENSE file and fill in this section when releasing as open source. -->
-	<!-- <licenses>
+	<licenses>
 		<license>
 			<name>The 3-Clause BSD License</name>
 			<url>https://opensource.org/license/bsd-3-clause</url>
 		</license>
-	</licenses> -->
+	</licenses>
 
 	<developers>
 		<developer>
