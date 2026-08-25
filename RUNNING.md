@@ -39,17 +39,19 @@ java -jar fhir-sandbox.jar --spring.config.location=classpath:/application.prope
 
 ### Server Port
 
-By default, the application binds to port 8081 for local development (containerized deployments bind to 8080). Depending on the constraints of your client applications, you may need to adjust the port that the FHIR sandbox binds to. To do this, set the `server.port` property.
+By default, the application binds to port 8080. Depending on the constraints of your client applications, you may need to adjust the port that the FHIR sandbox binds to. To do this, set the `server.port` property.
 
 ```properties
-server.port=8080
+server.port=8081
 ```
 
 This also impacts the OAuth2 issuer URL.
 
 ```properties
-octri.sandbox.oauth2.issuer-url=http://localhost:8080/fhir-sandbox
+octri.sandbox.oauth2.issuer-url=http://localhost:8081/fhir-sandbox
 ```
+
+The port _must_ be different from the one configured for the FHIR server.
 
 ### OAuth2 Private Key
 
@@ -61,10 +63,10 @@ octri.sandbox.oauth2.private-key-location=file:/path/to/your/sandbox-key.pem
 
 ### FHIR Server URL
 
-By default, the FHIR server is expected to be available at the URL http://localhost:8001/fhir. If you modified the FHIR server's port or context path, adjust the `octri.sandbox.fhir.base-url` property. For example, if you configured the FHIR server to bind to port 8000, this would be the FHIR base URL.
+By default, the FHIR server is expected to be available at the URL http://localhost:8000/fhir. If you modified the FHIR server's port or context path, adjust the `octri.sandbox.fhir.base-url` property. For example, if you configured the FHIR server to bind to port 8001, this would be the FHIR base URL.
 
 ```properties
-octri.sandbox.fhir.base-url=http://localhost:8000/fhir
+octri.sandbox.fhir.base-url=http://localhost:8001/fhir
 ```
 
 ### Authentication Properties
@@ -149,14 +151,14 @@ VALUES ('12345', @expiration, @userid);
 With the jar running, navigate to the application's password reset token url, providing the token parameter:
 
 ```
-http://localhost:8081/fhir-sandbox/user/password/reset?token=12345
+http://localhost:8080/fhir-sandbox/user/password/reset?token=12345
 ```
 
 You will be prompted to set a new password and will be able to log in once completed.
 
 ## Starting the Applications
 
-Start the PostgreSQL database and FHIR server according to the instructions in [OHSU-OCTRI/fhir-sandbox-backend].
+Start the FHIR server according to the instructions in [OHSU-OCTRI/fhir-sandbox-backend](https://github.com/OHSU-OCTRI/fhir-sandbox-backend/blob/main/RUNNING.md).
 
 https://github.com/OHSU-OCTRI/fhir-sandbox-backend/blob/main/RUNNING.md
 
