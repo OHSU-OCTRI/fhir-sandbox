@@ -46,7 +46,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>17</java.version>
 		<node.version>v24.15.0</node.version>
-		<authlib.version>4.2.1</authlib.version>
+		<authlib.version>4.2.2</authlib.version>
 		<commonlib.version>2.1.1</commonlib.version>
 		<caffeine.version>3.2.4</caffeine.version>
 		<!-- Override version for MySQL 8.4 support -->
